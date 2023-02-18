@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+
+
+
+{% block main %}
+
+{% block niveau %}
+<ul class="nav nav-tabs">
+  <li class="nav-item m-2">
+    <a href="{% url 'create_n1' %}" class=" btn btn-success">
+         <i class="fas fa-car text-white"></i>&nbsp; <span class="d-none d-sm-inline text-white">Niveau 1</span>
+    </a>
+  </li>
+  <li class="nav-item m-2">
+    <a href="{% url 'create_n2' %}" class=" btn btn-success"> 
+        <i class="fas fa-car text-white"></i>&nbsp; <span class="d-none d-sm-inline text-white">Niveau 2</span>
+    </a>
+  </li>
+  <li class="nav-item m-2">
+    <a href="{% url 'create_n3' %}" class=" btn btn-success"> 
+        <i class="fas fa-car text-white"></i>&nbsp; <span class="d-none d-sm-inline text-white">Niveau 3</span>
+    </a>
+  </li>
+  <li class="nav-item m-2">
+    <a href="{% url 'create_n4' %}" class=" btn btn-success"> 
+        <i class="fas fa-car text-white"></i> &nbsp; <span class="d-none d-sm-inline text-white">Niveau 4</span>
+    </a>
+  </li>
+  <li class="nav-item m-2">
+    <a href="{% url 'create_n5' %}" class=" btn btn-success"> 
+        <i class="fas fa-car text-white"></i>&nbsp; <span class="d-none d-sm-inline text-white">Niveau 5</span>
+    </a>
+  </li>
+</ul>
+{% endblock niveau %}
+
+  
+
+
+
+
+{% endblock main %}

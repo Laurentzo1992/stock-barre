@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+
+
+{% block main %} 
+	
+
+<div class="container d-flex flex-column mb-5">
+    {% block dashboad %}
+    <div class="row">
+        <div class="col-4">
+            <div class="card text-bg-primary mb-5 mt-2 shadow-lg">
+                <div class="card-header text-white text-center text-uppercase font-weight-bold bg-secondary">Stock Global</div>
+                <div class="card-body">
+                <h1 class="card-title text-center text-secondary"><i class="fa-solid fa-cart-plus" style="color: #f5ef34;"></i>&nbsp;&nbsp;&nbsp;&nbsp; {{articles}} </h1>
+                </div>
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="card text-bg-primary mb-5 mt-2 shadow-lg">
+                <div class="card-header text-white text-center text-uppercase font-weight-bold bg-secondary">Commandes</div>
+                <div class="card-body">
+                <h1 class="card-title text-center text-secondary"><i class="fa-solid fa-server" style="color: #C70039;"></i>&nbsp;&nbsp;&nbsp;&nbsp; 00 </h1>
+                </div>
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="card text-bg-primary mb-5 mt-2 shadow-lg">
+                <div class="card-header text-white text-center text-uppercase font-weight-bold bg-secondary">Livraison</div>
+                <div class="card-body">
+                    
+                    <h1 class="card-title text-center text-secondary"><i class="fa-solid fa-plane" style="color: #9c1187;"></i>&nbsp;&nbsp;&nbsp;&nbsp;  00 </h1>
+                </div>
+            </div>
+        </div>
+    </div>
+   {% endblock dashboad %}
+   
+</div>
+
+
+{% endblock main %}

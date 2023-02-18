@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block navb %} {% endblock navb %}
+{% load static %}
+
+
+{% block main %} 
+					
+
+
+<div class="global-container">
+  {% if message %}
+        <div class="alert alert-warning alert-dismissible fade show bg-success" role="alert">
+          <strong class="text-white">{{message}}!</strong>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+  {% endif %}
+  <div class="card login-form">
+    <div class="card-body">
+      <h1 class="card-title text-center text-white"><img src="{% static 'images/app_img/barre.png' %}" class="w-25">STOCK-M</h1>
+      <div class="card-text">
+        <form method="post" class="form-actions form-check form-control form-control-border">
+          {% csrf_token %}
+          <div class="form-group text-success font-italic font-weight-bold">
+            <label for="exampleInputEmail1">Username</label>
+            <input type="text" name="username" id="exampleInputEmail1" class="form-control form-control-sm p-2">
+          </div>
+          <div class="form-group text-success font-italic font-weight-bold">
+            <label for="exampleInputPassword1">Pasword</label>
+            {% comment %} <a href="" style="float: right; font-size: 12px;">Mot de pass oublié?</a> {% endcomment %}
+            <input type="password" name="password" id="exampleInputPassword1" class="form-control form-control-sm p-2">
+          </div>
+          <button type="submit" class="btn btn-primary btn-bloc"> Connexion</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+        
+      
+
+{% endblock main %}
+
+
+{% block footer %} {% endblock footer %}

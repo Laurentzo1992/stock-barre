@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+
+
+{% block main %} 
+	
+
+<a href="{% url 'add_product' %}" class=" btn btn-success float-end">
+<span class="d-none d-sm-inline text-white"> <i class="fas fa-plus text-white"></i></span>
+</a>
+
+
+<div class="container d-flex flex-column mb-5">
+    {% block dashboad %}
+   
+   {% endblock dashboad %}
+   
+    <div class="row">
+        <table id="example" class="display table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>Article</th>
+                    <th>Code</th>
+                    <th>Code bare</th>
+                    <th> stock</th>
+                    <th>Niveau</th>
+                    <th style="width: 10%;">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for article in page_obj %}
+                <tr>
+                    <td>{{article.name}}</td>
+                    <td>{{article.code}}</td>
+                    <td><a href=""><img src="{{article.barcode.url}}" class="w-25 h-15"></a></td>
+                    <td>{{article.stock}}</td>
+                    <td>{{article.sous_contenaire}}</td>
+                    <td>
+                        <a href="{% url 'edit_product' article.id %}" class="btn btn-warning bg-warning text-center" title="Modifier">
+                              <i style="font-size: 15px;" class="fa-solid fa-pencil"></i>
+                        </a> 
+                        <a href="{% url 'delete_product' article.id %}" class="btn btn-danger bg-danger text-center" title="Supprimer">
+                              <i style="font-size: 15px;" class="fa-solid fa-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="pagination">
+            <span class="step-links">
+                  {% if page_obj.has_previous %}
+                  <a href="?page=1">&laquo; suivant</a>
+                  <a href="?page={{ page_obj.previous_page_number }}">précédent</a>
+                  {% endif %}
+  
+            <span class="current">
+                  Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}.
+            </span>
+  
+            {% if page_obj.has_next %}
+                  <a href="?page={{ page_obj.next_page_number }}">suivant</a>
+                  <a href="?page={{ page_obj.paginator.num_pages }}">précédent &raquo;</a>
+            {% endif %}
+            </span>
+      </div>
+    </div>
+</div>
+
+
+{% endblock main %}
