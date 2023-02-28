@@ -1,11 +1,11 @@
 {% extends 'stock/niveau.html' %}
-
+{% block title %} Niveau2 {% endblock %}
 
 {% block main %}
 
 
 {% block niveau %}
-<a href="" class=" btn btn-success disabled">
+<a href="" class=" btn btn-info disabled">
   <i class="fas fa-car text-white"></i>&nbsp; <span class="d-none d-sm-inline text-white">Niveau 2</span>
 </a>
 {% endblock niveau %}
@@ -50,12 +50,9 @@
                             <td>{{niveau.name}}</td>
                             <td>{{niveau.niveau1.name}}</td>
                             <td>
-                                <a href="" class="btn btn-warning bg-warning text-center" title="Modifier">
+                                <a href="{% url 'edit_n2' niveau.id %}" class="btn btn-warning bg-warning text-center" title="Modifier">
                                       <i style="font-size: 15px;" class="fa-solid fa-pencil"></i>
                                 </a> 
-                                <a href="" class="btn btn-danger bg-danger text-center" title="Supprimer">
-                                      <i style="font-size: 15px;" class="fa-solid fa-trash"></i>
-                                </a>
                             </td>
                         </tr>
                         {% endfor %}

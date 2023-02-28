@@ -3,42 +3,17 @@
 {% block main %}
 
 <div class="container mb-5">
-    <form class="p-3 mt-2 myform" action="{% url 'commande' %}" method="post">
+    <form class="p-3 mt-2 myform" action="{% url 'add_stock' %}" method="post">
     <div class="row mt-2 mb-2 p-2">
         <div class="col-6 shadow-lg">
             {% csrf_token %}
 
             <div class="col-12 p-2 mt-2 text-info font-weight-bold font-italic d-flex flex-column">
-              <label for="num_commande"> Numero commande </label>
-              <input required name="num_commande" type="text" value="{{num_commande}}" min="1" step="0.1" class="form-control" id="num_commande" readonly>
-            </div>
-            <div class="col-12 p-2 mt-2 text-info font-weight-bold font-italic d-flex flex-column">
-              <label for="adresse_livraison"> Adresse de livraison</label>
-              <input required name="adresse_livraison" type="text" min="1" step="0.1" class="form-control" id="adresse_livraison">
-            </div>
-            <div class="col-12 p-2 mt-2 text-info font-weight-bold font-italic d-flex flex-column">
-              <label for="date_commande"> Date de commande</label>
-              <input required name="date_commande" type="date" min="1" step="0.1" class="form-control" id="date_commande">
-            </div>
-
-
-            <div class="col-12 p-2 mt-2 text-info font-weight-bold font-italic d-flex flex-column">
-                <label for="fournisseur"> Client </label>
+                <label for="fournisseur"> Fournisseurs </label>
                 <select name="fournisseur" class="form-control" id="fournisseur">
-                    <option>Choisir le fournisseur . . . </option>
+                    <option>Choisir le fournisseur ... </option>
                     {% for fournis in suppliers %}
                     <option value="{{fournis.id}}">{{forloop.counter}}-{{fournis.rasion_sociale}}</option>
-                    {% endfor %}
-                </select>
-            </div>
-
-
-            <div class="col-12 p-2 mt-2 text-info font-weight-bold font-italic d-flex flex-column">
-                <label for="transport"> Transporteur </label>
-                <select name="transport" class="form-control" id="transport">
-                    <option>Choisir le transporteur . . . </option>
-                    {% for transport in transports %}
-                    <option value="{{transport.id}}">{{forloop.counter}}-{{transport.name_transp}}</option>
                     {% endfor %}
                 </select>
             </div>
@@ -55,10 +30,10 @@
                 <div class="ligne row p-2 mt-2 text-info font-weight-bold font-italic" id="ligne">
                     <div class="col-4  p-2">
                         <label for="article-1">Article</label>
-                        <select name="articles" class="form-control" id="article-1">
+                        <select name="products" class="form-control" id="article-1">
                             <option> Choisir ... </option>
-                            {% for article in articles %}
-                            <option value="{{article.id}}">{{forloop.counter}}-{{article.name}}</option>
+                            {% for product in products %}
+                            <option value="{{product.id}}">{{forloop.counter}}-{{product.name}}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -99,10 +74,10 @@
                         <div class="ligne row p-2 mt-2 text-info font-weight-bold font-italic" id="ligne">
                             <div class="col-4  p-2">
                                 <label for="article-${number}">Article</label>
-                                <select name="articles" class="form-control" id="article-${number}">
+                                <select name="products" class="form-control" id="article-${number}">
                                     <option> Choisir ... </option>
-                                    {% for article in articles %}
-                                    <option value="{{article.id}}">{{forloop.counter}}-{{article.name}}</option>
+                                    {% for product in products %}
+                                    <option value="{{product.id}}">{{forloop.counter}}-{{product.name}}</option>
                                     {% endfor %}
                                 </select>
                             </div>

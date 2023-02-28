@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %} Commande-confimre {% endblock %}
+{% block main %}
+<h1>Confirmation de la commande</h1>
+<p>La commande a été passée avec succès.</p>
+<p>Numéro de commande : {{ commande.id }}</p>
+<p>Adresse de livraison : {{ commande.adresse_livraison }}</p>
+<p>Date de livraison : {{ commande.date_livraison }}</p>
+<h2>Produits commandés</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Article</th>
+      <th>Quantité</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for ligne_commande in commande.lignecommande_set.all %}
+    <tr>
+      <td>{{ ligne_commande.produit.name }}</td>
+      <td>{{ ligne_commande.quantite }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

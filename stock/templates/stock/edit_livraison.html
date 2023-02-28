@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block title %} Livraison {% endblock %}
+{% block main %}
+
+
+<div class="container mb-5">
+        <form method="POST" class="card p-3 mt-2 myform"> 
+                  {% csrf_token %}
+            <div class="row">
+                <div class="col-6">
+                        <div class="row p-2">
+                              <label for="num_livraison"> Numero livraison </label>
+                            {{form.num_livraison}}
+                        </div>
+
+                        <div class="row p-2">
+                              <label for="date_livaison"> Date livraison </label>
+                              {{form.date_livaison}}
+                        </div>
+                        <div class="row p-2">
+                              <label for="livre">Status</label>
+                              {{form.livre}}
+                              
+                        </div>
+                        
+                </div>
+
+                <div class="col-6">
+                       
+                       
+                </div>
+            </div>
+
+                <div class="mt-2">
+                        <button style= "font-size: 15px;" type="submit" class="btn btn-info mb-3">
+                            <i class="fas fa-plus"></i>&nbsp;&nbsp; Valider
+                        </button>
+                </div> 
+        </form>
+    </div>
+</div>
+{% endblock main %}
+
+
+
+           
+   
+

@@ -1,12 +1,12 @@
-{% extends 'stock/niveau.html' %}
-{% block title %} Niveau3 {% endblock %}
+{% extends 'stock/create_n2.html' %}
+{% block title %} modifier niveau 2 {% endblock %}
 
 {% block main %}
 
 
 {% block niveau %}
 <a href="" class=" btn btn-info disabled">
-  <i class="fas fa-car text-white"></i>&nbsp; <span class="d-none d-sm-inline text-white">Niveau 3</span>
+  <i class="fas fa-car text-white"></i>&nbsp; <span class="d-none d-sm-inline text-white">Niveau 2</span>
 </a>
 {% endblock niveau %}
 
@@ -14,7 +14,7 @@
 <div class="container mb-5">
   <div class="row">
         <div class="col-6">
-              <form method="POST" class="card p-3 mt-2 myform" action="{% url 'create_n3' %}" autocomplete="off"> 
+              <form method="POST" class="card p-3 mt-2 myform"> 
               {% csrf_token %}
                     <div class="row p-2">
                           <label for="number"> Libéllé </label>
@@ -23,7 +23,7 @@
 
                     <div class="row p-2">
                       <label for="number"> Lié à </label>
-                      {{form.niveau2}}
+                      {{form.niveau1}}
                     </div>
                     
                     <div class="mt-2">
@@ -45,17 +45,17 @@
                         </tr>
                     </thead>
                     <tbody>
-                          {% for niveau in niveau3 %}
+                         
                         <tr>
-                            <td>{{niveau.name}}</td>
-                            <td>{{niveau.niveau2.name}}</td>
+                            <td>{{niveau2.name}}</td>
+                            <td>{{niveau2.niveau1.name}}</td>
                             <td>
-                                <a href="{% url 'edit_n3' niveau.id %}" class="btn btn-warning bg-warning text-center" title="Modifier">
+                                <a href="" class="btn btn-warning bg-warning text-center" title="Modifier">
                                       <i style="font-size: 15px;" class="fa-solid fa-pencil"></i>
                                 </a> 
                             </td>
                         </tr>
-                        {% endfor %}
+                    
                     </tbody>
               </table>
         </div>

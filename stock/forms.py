@@ -3,6 +3,8 @@ from django import forms
 from django.core.validators import RegexValidator
 from django import forms
 from .models import *
+from phonenumber_field.widgets import PhoneNumberInternationalFallbackWidget, PhoneNumberPrefixWidget
+
 
 class LoginForm(forms.Form):
     username = forms.CharField(max_length=63, label='Nom tilisateur')
@@ -46,12 +48,47 @@ class Niveau5Form(forms.ModelForm):
         fields = '__all__'
         
         
+class ClientForm(forms.ModelForm):
+    class Meta:
+        model = Client
+        fields = '__all__'
+        widgets = {
+            'adresse': forms.Textarea(attrs={'rows': 4, 'cols': 40}),
+            'phone_number': PhoneNumberPrefixWidget,
+        }
+       
+
+        
+        
         
 class ProductForm(forms.ModelForm):
     class Meta:
         model = Product
         fields = '__all__'
-        
         widgets = {
             'description': forms.Textarea(attrs={'rows': 4, 'cols': 40}),
         }
+       
+
+class TransporteurForm(forms.ModelForm):
+    class Meta:
+        model = Transporteur
+        fields = '__all__'
+        
+        widgets = {
+            'phone_number': PhoneNumberPrefixWidget,
+        }
+        
+        
+
+class LivraisonForm(forms.ModelForm):
+    date_livaison = forms.DateField(
+        label='Date de livraison',
+        widget=forms.TextInput(attrs={'type': 'date'})
+    )
+    class Meta:
+        model = Livraison
+        fields = '__all__'
+         
+         
+        

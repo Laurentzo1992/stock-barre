@@ -1,44 +1,40 @@
 {% extends 'base.html' %}
-{% block title %}Ajout-client{% endblock %}
+{% block title %} ajout-client {% endblock %}
 {% block main %}
 
 
 <div class="container mb-5">
-        <form method="POST" class="card p-3 mt-2 myform" action="{% url 'add_product' %}" autocomplete="off" enctype="multipart/form-data"> 
+        <form method="POST" class="card p-3 mt-2 myform" action="{% url 'add_client' %}" autocomplete="off"> 
                   {% csrf_token %}
             <div class="row">
                 <div class="col-6">
                         <div class="row p-2">
-                              <label for="code"> Code </label>
-                              {{form.code}}
+                              <label for="rasion_sociale"> Raison sociale </label>
+                              {{form.rasion_sociale}}
                         </div>
 
                         <div class="row p-2">
-                              <label for="name"> Nom Article </label>
-                              {{form.name}}
+                              <label for="nom_prenom"> Nom && Prénom </label>
+                              {{form.nom_prenom}}
                         </div>
                         
                         <div class="row p-2">
-                              <label for="stock">Stock </label>
-                              {{form.stock}}
+                              <label for="phone_number">Téléphone </label>
+                              {{form.phone_number}}
                         </div>
                 </div>
 
                 <div class="col-6">
                         <div class="row p-2">
-                              <label for="sous_contenaire"> Niveau </label>
-                              {{form.sous_contenaire}}
+                              <label for="email"> Email </label>
+                              {{form.email}}
                         </div>
 
                         <div class="row p-2">
-                              <label for="description"> Description </label>
-                              {{form.description}}
+                              <label for="adresse"> Addresse </label>
+                              {{form.adresse}}
                         </div>
                         
-                        <div class="row p-2">
-                              <label for="barcode">Barre code</label>
-                              {{form.barcode}}
-                        </div>
                 </div>
             </div>
 

@@ -10,6 +10,7 @@ admin.site.register(Product)
 admin.site.register(Client)
 admin.site.register(Commande)
 admin.site.register(Livraison)
+admin.site.register(Transporteur)
 
 
 # Register your models here.

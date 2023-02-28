@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-
+{% block title %}Login{% endblock %}
 {% block navb %} {% endblock navb %}
 {% load static %}
 
@@ -30,15 +30,27 @@
             {% comment %} <a href="" style="float: right; font-size: 12px;">Mot de pass oublié?</a> {% endcomment %}
             <input type="password" name="password" id="exampleInputPassword1" class="form-control form-control-sm p-2">
           </div>
-          <button type="submit" class="btn btn-primary btn-bloc"> Connexion</button>
+          <button id="myButton" onclick="disableButton()" type="submit" class="btn btn-primary btn-bloc"> connexion</button>
         </form>
       </div>
     </div>
   </div>
 </div>
         
-      
+<script>
 
+function disableButton() {
+  var button = document.getElementById("myButton");
+  button.disabled = true;
+  button.innerHTML = "connexion...";
+}
+
+window.onload = function() {
+  var button = document.getElementById("myButton");
+  button.disabled = false;
+  button.innerHTML = "connexion";
+}
+</script>
 {% endblock main %}
 
 

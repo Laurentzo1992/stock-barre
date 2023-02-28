@@ -1,9 +1,10 @@
 from . import forms
-from .forms import ProductForm, LoginForm, Niveau1Form, Niveau2Form, Niveau3Form, Niveau4Form, Niveau5Form
+from .forms import ProductForm, ClientForm, LivraisonForm, TransporteurForm ,LoginForm, Niveau1Form, Niveau2Form, Niveau3Form, Niveau4Form, Niveau5Form
 from django.contrib.auth.forms import PasswordChangeForm
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render, get_object_or_404
 from django.contrib.auth import login, authenticate, logout, get_user_model, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
+from  django.views.decorators.cache import cache_control 
 User = get_user_model()
 from  django.contrib import messages
 from django.http import HttpResponseRedirect, HttpResponse, FileResponse, JsonResponse
@@ -11,13 +12,23 @@ from django.core.paginator import Paginator
 from django.db.models import Count, Sum
 from stock.models import *
 from escpos.printer import Usb
+from django.db import transaction, models
+from django.utils import timezone
+import uuid
+import datetime
+from datetime import date
+
+
 
 
 
 @login_required
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def index(request):
     articles = Product.objects.all().count()
-    context={"articles":articles}
+    articles_commandes = Commande.objects.all().count()
+    articles_livres = Livraison.objects.filter(livre=True).count()
+    context={"articles":articles, "articles_commandes":articles_commandes, "articles_livres":articles_livres}
     return render(request, 'stock/index.html', context)
 
 
@@ -56,6 +67,7 @@ def logout_user(request):
 
 
 @login_required
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def change_password(request):
     if request.method == 'POST':
         form = PasswordChangeForm(request.user, request.POST)
@@ -71,13 +83,132 @@ def change_password(request):
     return render(request, 'stock/change_password.html', {
         'form': form
     })
-    
+
 
 @login_required
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def client(request):
+    clients = Client.objects.all().order_by('-id')
+    paginator = Paginator(clients, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    context={"page_obj":page_obj}
+    return render(request, 'stock/client.html', context)  
+
+
+@login_required
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def add_client(request):
+    if request.method == 'POST':
+        form = ClientForm(request.POST)
+        if form.is_valid():
+            form.save()
+            cont_type1 = form.cleaned_data.get('rasion_sociale')
+            cont_type2 = form.cleaned_data.get('rasion_sociale')
+            messages.success(request, f"{cont_type1}, {cont_type2} ajouté avec succès!")
+            return HttpResponseRedirect('client')
+        else:
+            messages.error(request, "Veuillez verifiez svpla saisie!")
+            return render(request, 'stock/add_client.html', {'form':form})
+    else:
+        form = ClientForm()
+    return render(request, 'stock/add_client.html', {'form':form})
+
+
+@login_required
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def edit_client(request, id):
+    client = Client.objects.get(id=id)
+    if request.method == 'POST':
+        form = ClientForm(request.POST,request.FILES, instance=client)
+        if form.is_valid():
+            form.save(id)
+            messages.success(request, f"Mise à jour {client.rasion_sociale} ok !")
+            return redirect('client')
+    else:
+        form = ClientForm(instance=client)
+    return render(request, 'stock/edit_client.html', {'form':form, "client":client})
+
+
+
+@login_required
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def delete_client(request, id):
+    client = Client.objects.get(id=id)
+    if request.method=='POST':
+        client.delete()
+        messages.success(request, f'{client.rasion_sociale} supprimé !')
+        return redirect("client")
+    return render(request, 'stock/delete_client.html', {"client":client})
+
+@login_required
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def transport(request):
+    transports = Transporteur.objects.all().order_by('-id')
+    paginator = Paginator(transports, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    context={"page_obj":page_obj}
+    return render(request, 'stock/transport.html', context)  
+
+
+
+@login_required
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def add_transport(request):
+    if request.method == 'POST':
+        form = TransporteurForm(request.POST)
+        if form.is_valid():
+            form.save()
+            cont_type1 = form.cleaned_data.get('name_transp')
+            messages.success(request, f"{cont_type1} ajouté avec succès!")
+            return HttpResponseRedirect('transport')
+        else:
+            messages.error(request, "Veuillez verifiez svpla saisie!")
+            return render(request, 'stock/add_client.html', {'form':form})
+    else:
+        form = TransporteurForm()
+    return render(request, 'stock/add_transport.html', {'form':form})
+
+
+
+
+@login_required
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)  
+def edit_transport(request, id):
+    transport = Transporteur.objects.get(id=id)
+    if request.method == 'POST':
+        form = TransporteurForm(request.POST,request.FILES, instance=transport)
+        if form.is_valid():
+            form.save(id)
+            messages.success(request, f"Mise à jour {transport.name_transp} ok !")
+            return redirect('transport')
+    else:
+        form = TransporteurForm(instance=transport)
+    return render(request, 'stock/edit_transport.html', {'form':form, "transport":transport})
+
+
+
+@login_required
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def delete_transport(request, id):
+    transport = Transporteur.objects.get(id=id)
+    if request.method=='POST':
+        transport.delete()
+        messages.success(request, f'{transport.name_transp} supprimé !')
+        return redirect("transport")
+    return render(request, 'stock/delete_transport.html', {"transport":transport})
+
+
+
+
+@login_required
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def niveau(request):
     return render(request, 'stock/niveau.html')
 
 @login_required
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def create_n1(request):
     niveau1 = Niveau1.objects.all()
     if request.method == 'POST':
@@ -95,7 +226,25 @@ def create_n1(request):
     return render(request, 'stock/create_n1.html', {"niveau1":niveau1, 'form':form})
 
 
+
 @login_required
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)  
+def edit_n1(request, id):
+    niveau = Niveau1.objects.get(id=id)
+    if request.method == 'POST':
+        form = Niveau1Form(request.POST,request.FILES, instance=niveau)
+        if form.is_valid():
+            form.save(id)
+            cont_type = form.cleaned_data.get('name')
+            messages.success(request, f"{cont_type} mis à jour avec succès!")
+            return redirect('create_n1')
+    else:
+        form = Niveau1Form(instance=niveau)
+    return render(request, 'stock/edit_n1.html', {"niveau":niveau, 'form':form})
+
+
+@login_required
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def create_n2(request):
     niveau2 = Niveau2.objects.all()
     if request.method == 'POST':
@@ -112,7 +261,27 @@ def create_n2(request):
         form = Niveau2Form()
     return render(request, 'stock/create_n2.html', {"niveau2":niveau2, 'form':form})
 
+
+
 @login_required
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)  
+def edit_n2(request, id):
+    niveau2 = Niveau2.objects.get(id=id)
+    if request.method == 'POST':
+        form = Niveau2Form(request.POST,request.FILES, instance=niveau2)
+        if form.is_valid():
+            form.save(id)
+            cont_type = form.cleaned_data.get('name')
+            messages.success(request, f"{cont_type} mis à jour avec succès!")
+            return redirect('create_n2')
+    else:
+        form = Niveau2Form(instance=niveau2)
+    return render(request, 'stock/edit_n2.html', {"niveau2":niveau2, 'form':form})
+
+
+
+@login_required
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def create_n3(request):
     niveau3 = Niveau3.objects.all()
     if request.method == 'POST':
@@ -129,7 +298,27 @@ def create_n3(request):
         form = Niveau3Form()
     return render(request, 'stock/create_n3.html', {"niveau3":niveau3, 'form':form})
 
+
 @login_required
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)  
+def edit_n3(request, id):
+    niveau3 = Niveau3.objects.get(id=id)
+    if request.method == 'POST':
+        form = Niveau3Form(request.POST,request.FILES, instance=niveau3)
+        if form.is_valid():
+            form.save(id)
+            cont_type = form.cleaned_data.get('name')
+            messages.success(request, f"{cont_type} mis à jour avec succès!")
+            return redirect('create_n3')
+    else:
+        form = Niveau3Form(instance=niveau3)
+    return render(request, 'stock/edit_n3.html', {"niveau3":niveau3, 'form':form})
+
+
+
+
+@login_required
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def create_n4(request):
     niveau4 = Niveau4.objects.all()
     if request.method == 'POST':
@@ -146,7 +335,27 @@ def create_n4(request):
         form = Niveau4Form()
     return render(request, 'stock/create_n4.html', {"niveau4":niveau4, 'form':form})
 
+
 @login_required
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)  
+def edit_n4(request, id):
+    niveau4 = Niveau4.objects.get(id=id)
+    if request.method == 'POST':
+        form = Niveau4Form(request.POST,request.FILES, instance=niveau4)
+        if form.is_valid():
+            form.save(id)
+            cont_type = form.cleaned_data.get('name')
+            messages.success(request, f"{cont_type} mis à jour avec succès!")
+            return redirect('create_n4')
+    else:
+        form = Niveau4Form(instance=niveau4)
+    return render(request, 'stock/edit_n4.html', {"niveau4":niveau4, 'form':form})
+
+
+
+
+@login_required
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def create_n5(request):
     niveau5 = Niveau5.objects.all()
     if request.method == 'POST':
@@ -163,18 +372,118 @@ def create_n5(request):
         form = Niveau5Form()
     return render(request, 'stock/create_n5.html', {"niveau5":niveau5, 'form':form})
 
+
 @login_required
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)  
+def edit_n5(request, id):
+    niveau5 = Niveau5.objects.get(id=id)
+    if request.method == 'POST':
+        form = Niveau5Form(request.POST,request.FILES, instance=niveau5)
+        if form.is_valid():
+            form.save(id)
+            cont_type = form.cleaned_data.get('name')
+            messages.success(request, f"{cont_type} mis à jour avec succès!")
+            return redirect('create_n5')
+    else:
+        form = Niveau5Form(instance=niveau5)
+    return render(request, 'stock/edit_n5.html', {"niveau5":niveau5, 'form':form})
+
+
+
+
+@login_required 
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def commande(request):
-    return render(request, 'stock/commande.html')
+    if request.method == 'POST':
+        supplier_id = request.POST.get('fournisseur')
+        supplier = Client.objects.get(pk=supplier_id)
+        adresse_livraison = request.POST.get('adresse_livraison')
+        date_commande = request.POST.get('date_commande')
+        num_commande = request.POST.get('num_commande')
+        transport_id = request.POST.get('transport')
+        transport = Transporteur.objects.get(pk=transport_id)
+        commande = Commande.objects.create(client=supplier,
+                                            date_commande=date_commande,
+                                            adresse_livraison=adresse_livraison,
+                                            num_commande=num_commande,
+                                            transport=transport
+                                            )
+        selected_products = request.POST.getlist('articles')
+        with transaction.atomic():
+            for article_id in selected_products:
+                quantity = int(request.POST.get('quantity'))
+                article = Product.objects.get(id=article_id)
+                # Vérifiez si la quantité demandée est disponible
+                if article.stock >= quantity:
+                    article.stock = models.F('stock') - quantity
+                    article.save()
+
+                    LigneCommande.objects.create(commande=commande,
+                                                     article=article,
+                                                     quantite=quantity)
+
+                else:
+                        # Si la quantité n'est pas disponible, annulez la commande et affichez un message d'erreur
+                    commande.delete()
+                    messages.error(request, f"La quantité demandée pour '{article.name}' n'est pas disponible.")
+
+                    return redirect('livraison')
+
+            Livraison.objects.create(commande=commande,
+                                      num_livraison=commande.num_commande,
+                                      livre=False,
+                                      )
+
+        messages.success(request, 'Votre commande a été passée avec succès!')
+        return redirect('livraison')
+
+    else:
+        articles = Product.objects.all()
+        suppliers = Client.objects.all()
+        transports = Transporteur.objects.all()
+        prefixe = 'CMD-'
+        idc = str(uuid.uuid4().int)[:10]
+        suffixe = date.today()
+        sep = '-'
+        num_commande = prefixe + idc + sep  + str(suffixe)
+        context = {'articles': articles, "suppliers":suppliers, "transports":transports, "num_commande":num_commande}
+        return render(request, 'stock/commande.html', context)
+
+
 
 @login_required
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def livraison(request):
-    return render(request, 'stock/livraison.html')
+    livraisons = Livraison.objects.filter(livre=False).order_by('-id')
+    paginator = Paginator(livraisons, 5)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    context={"page_obj":page_obj}
+    return render(request, 'stock/livraison.html', context)
 
 
 @login_required
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def edit_livraison(request, livraison_id):
+    livraison = get_object_or_404(Livraison, id=livraison_id)
+    commande = livraison.commande
+    form = LivraisonForm(request.POST or None, instance=livraison)
+    if form.is_valid():
+        livraison = form.save(commit=False)
+        livraison.livre = True
+        livraison.save()
+        commande.save()
+        return redirect('suivi')
+    return render(request, 'stock/edit_livraison.html', {'form': form, 'livraison': livraison})
+
+
+
+
+
+@login_required
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def produit(request):
-    articles = Product.objects.all()
+    articles = Product.objects.all().order_by('-id')
     paginator = Paginator(articles, 5)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -183,6 +492,7 @@ def produit(request):
 
 
 @login_required
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def add_product(request):
     if request.method=="POST":
         form = ProductForm(request.POST)
@@ -199,7 +509,8 @@ def add_product(request):
         form = ProductForm()
         return render(request, 'stock/add_product.html', {"form":form})
     
-@login_required   
+@login_required
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def edit_product(request, id):
     product = Product.objects.get(id=id)
     if request.method == 'POST':
@@ -213,7 +524,8 @@ def edit_product(request, id):
     return render(request, 'stock/edit_product.html', {'form':form})
 
 
-@login_required 
+@login_required
+@cache_control(no_cache=True, must_revalidate=True, no_store=True) 
 def delete_product(request, id):
     product = Product.objects.get(id=id)
     if request.method=='POST':
@@ -223,12 +535,63 @@ def delete_product(request, id):
     return render(request, 'stock/delete_product.html', {"product":product})
 
     
-@login_required 
-def suivi(request):
-    return render(request, 'stock/suivi.html')
+@login_required
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def stock_in(request):
+    operations = Operation.objects.all().order_by('-id')
+    paginator = Paginator(operations, 5)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    context={"page_obj":page_obj}
+    return render(request, 'stock/stock_in.html', context)
+
 
 
 @login_required
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def add_stock(request):
+    if request.method == 'POST':
+        selected_products = request.POST.getlist('products')
+        for product_id in selected_products:
+            quantity = int(request.POST.get('quantity'))
+            supplier_id = request.POST.get('fournisseur')
+            supplier = Client.objects.get(pk=supplier_id)
+            product = Product.objects.get(pk=product_id)
+            if quantity >= 1:
+                product.stock += quantity
+                product.save()
+                operation = Operation(
+                    products=product,
+                    quantity=quantity,
+                    fournisseur=supplier
+                    )
+                operation.save()
+                messages.success(request, f"Le stock {product} mis à jour avec succes !")
+            else:
+                messages.error(request, f" veuillez verifiez la quantité saisie")
+            
+        return redirect('stock_in')
+
+    products = Product.objects.all()
+    suppliers = Client.objects.all()
+    context = {'products': products, 'suppliers': suppliers}
+    return render(request, 'stock/add_stock.html', context)
+
+ 
+
+@login_required
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def suivi(request):
+    livraisons = Livraison.objects.all().filter(livre=True).order_by('-id')
+    paginator = Paginator(livraisons, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    context={"page_obj":page_obj}
+    return render(request, 'stock/suivi.html', context)
+
+
+@login_required
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def generate_barcode(product_number):
     #Crée un objet de code-barres Code128
     barcode = Code128(product_number)
@@ -238,6 +601,7 @@ def generate_barcode(product_number):
 
 
 @login_required
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def print_label(product):
     #Crée un objet d'imprimante USB
     printer = Usb(0x0416, 0x5011, 0, profile="POS-5890")
@@ -262,6 +626,7 @@ def print_label(product):
 
 
 @login_required
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def product_label(request, product_id):
     #Récupère l'objet Produit correspondant à l'ID donné
     product = Product.objects.get(pk=product_id)

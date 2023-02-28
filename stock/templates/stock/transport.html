@@ -1,9 +1,14 @@
 {% extends 'base.html' %}
-{% block title %} Livraison {% endblock %}
+{% block title %}Transporteur{% endblock %}
 
 
 {% block main %} 
 	
+
+<a href="{% url 'add_transport' %}" class=" btn btn-success float-end">
+<span class="d-none d-sm-inline text-white"> <i class="fas fa-plus text-white"></i></span>
+</a>
+
 
 <div class="container d-flex flex-column mb-5">
     {% block dashboad %}
@@ -14,28 +19,29 @@
         <table id="example" class="display table table-striped table-hover">
             <thead>
                 <tr>
-                    <th>Numero livraison</th>
-                    <th>Client</th>
-                    <th> Date Commande</th>
-                    <th> Transporteur</th>
-                    <th> Status </th>
+                    <th>Nom</th>
+                    <th>Coordonnées 1</th>
+                    <th>Coordonnées 2</th>
+                    <th>Téléphone </th>
+                    <th>Type de transport</th>
                     <th style="width: 10%;">Action</th>
                 </tr>
             </thead>
             <tbody>
-                {% for livraison in page_obj %}
+                {% for transport in page_obj %}
                 <tr>
-                    <td>{{livraison.num_livraison}}</td>
-                    <td>{{livraison.commande.client}}</td>
-                    <td>{{livraison.create_at}}</td>
-                    <td>{{livraison.commande.transport}}</td>
-                    {% if livraison.livre is False %}
-                    <td class="text-danger font-weight-bold"><i style="font-size: 15px;" class="fa-solid fa-circle"></i> &nbsp;&nbsp;En cours</td>
-                    {% endif %}
+                    <td>{{transport.name_transp}}</td>
+                    <td>{{transport.coordonn1}}</td>
+                    <td>{{transport.coordonn2}}</td>
+                    <td>{{transport.phone_number}}</td>
+                    <td>{{transport.type_trans}}</td>
                     <td>
-                        <a href="{% url 'edit_livraison' livraison.id %}" class="btn btn-info bg-info text-center text-white" title="Modifier">
-                              <i style="font-size: 15px;" class="fa-solid fa-check"></i>
+                        <a href="{% url 'edit_transport' transport.id %}" class="btn btn-warning bg-warning text-center" title="Modifier">
+                              <i style="font-size: 15px;" class="fa-solid fa-pencil"></i>
                         </a> 
+                        <a href="{% url 'delete_transport'  transport.id %}" class="btn btn-danger bg-danger text-center" title="Supprimer">
+                              <i style="font-size: 15px;" class="fa-solid fa-trash"></i>
+                        </a>
                     </td>
                 </tr>
                 {% endfor %}
@@ -63,4 +69,3 @@
 
 
 {% endblock main %}
-

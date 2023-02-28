@@ -13,11 +13,12 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <link rel="shortcut icon" href="{% static 'images/app_img/favicon_.ico' %}" type="image/x-icon">
-  <link rel="icon" href="{% static 'images/app_img/favicon_.ico' %}" type="image/x-icon">
-  <title>Login</title>
+  <link rel="shortcut icon" href="{% static 'images/app_img/favicon.ico' %}" type="image/x-icon">
+  <link rel="icon" href="{% static 'images/app_img/favicon.ico' %}" type="image/x-icon">
+  <title>{% block title %}{% endblock %}</title>
   <meta name="description" content="">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <link rel="stylesheet" href="{% static 'css/style.css' %}">
   <link rel="stylesheet" type="text/css" href={% static "css/bootstrap.min.css"%}>
   <link rel="stylesheet" type="text/css" href={% static "DataTables/datatables.min.css"%}/>
@@ -41,8 +42,32 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.css" integrity="sha256-aa0xaJgmK/X74WM224KMQeNQC2xYKwlAt08oZqjeF0E=" crossorigin="anonymous" />
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
   <script src="https://code.jquery.com/jquery-3.6.3.js" integrity="sha256-nQLuAZGRRcILA+6dMBOvcRh5Pe310sBpanc6+QBmyVM=" crossorigin="anonymous"></script>
+  <style>
+	/* Style du spinner */
+	.loader {
+		border: 16px solid #f3f3f3;
+		border-top: 16px solid #3498db;
+		border-radius: 50%;
+		width: 120px;
+		height: 120px;
+		animation: spin 2s linear infinite;
+		position: fixed;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		z-index: 9999;
+		display: none;
+	}
+
+	/* Animation du spinner */
+	@keyframes spin {
+		0% { transform: rotate(0deg); }
+		100% { transform: rotate(360deg); }
+	}
+</style>
   </head>
 <body>
+	<div class="loader"></div>
 	{% block navb %}
 	<!-------------Menu lateral gauche-------------------->
 	<div class="row bg-info mb-0 h-10">
@@ -73,8 +98,23 @@
 								</a>
 							</li>
 							<li class="nav-item">
+								<a href="{% url 'client' %}" class="nav-link align-middle px-0">
+									<i class="fas fa-users text-white"></i> <span class="ms-1 d-none d-sm-inline text-white">Client</span>
+								</a>
+							</li>
+							<li class="nav-item">
+								<a href="{% url 'transport' %}" class="nav-link align-middle px-0">
+									<i class="fas fa-car text-white"></i> <span class="ms-1 d-none d-sm-inline text-white">Transporteur</span>
+								</a>
+							</li>
+							<li class="nav-item">
 								<a href="{% url 'produit' %}" class="nav-link align-middle px-0">
 									<i class="fa-solid fa-newspaper text-white"></i> <span class="ms-1 d-none d-sm-inline text-white">Article</span>
+								</a>
+							</li>
+							<li class="nav-item">
+								<a href="{% url 'stock_in' %}" class="nav-link align-middle px-0">
+									<i class="fa-solid fa-arrow-trend-up text-white"></i> <span class="ms-1 d-none d-sm-inline text-white">Provisions</span>
 								</a>
 							</li>
 							<li class="nav-item">
@@ -89,7 +129,7 @@
 							</li>
 							<li class="nav-item">
 								<a href="{% url 'suivi' %}" class="nav-link align-middle px-0">
-									<i class="fa-solid fa-list-check text-white"></i> <span class="ms-1 d-none d-sm-inline text-white">Suivi</span>
+									<i class="fa-solid fa-map text-success"></i> <span class="ms-1 d-none d-sm-inline text-white">Suivi</span>
 								</a>
 							</li>
 							
@@ -153,6 +193,27 @@
 <script type="text/javascript" src="https://cdn.datatables.net/v/bs5/jq-3.6.0/jszip-2.5.0/dt-1.12.1/b-2.2.3/b-html5-2.2.3/b-print-2.2.3/datatables.min.js"></script> 
 
 {% django_htmx_script %}
+
+
+<script>
+	var loader = document.querySelector(".loader");
+
+	function showLoader() {
+		loader.style.display = "block";
+	}
+
+	function hideLoader() {
+		loader.style.display = "none";
+	}
+
+	document.addEventListener("DOMContentLoaded", function() {
+		showLoader();
+	});
+
+	window.addEventListener("load", function() {
+		hideLoader();
+	});
+</script>
 
 </body>
 </html>

@@ -1,12 +1,12 @@
 {% extends 'stock/niveau.html' %}
-
+{% block title %} Niveau5 {% endblock %}
 
 {% block main %}
 
 
 {% block niveau %}
-<a href="" class=" btn btn-success disabled">
-  <i class="fas fa-car text-white"></i>&nbsp; <span class="d-none d-sm-inline text-white">Niveau 2</span>
+<a href="" class=" btn btn-info disabled">
+  <i class="fas fa-car text-white"></i>&nbsp; <span class="d-none d-sm-inline text-white">Niveau 5</span>
 </a>
 {% endblock niveau %}
 
@@ -14,7 +14,7 @@
 <div class="container mb-5">
   <div class="row">
         <div class="col-6">
-              <form method="POST" class="card p-3 mt-2 myform" action="{% url 'create_n2' %}" autocomplete="off"> 
+              <form method="POST" class="card p-3 mt-2 myform" action="{% url 'create_n5' %}" autocomplete="off"> 
               {% csrf_token %}
                     <div class="row p-2">
                           <label for="number"> Libéllé </label>
@@ -50,12 +50,9 @@
                             <td>{{niveau.name}}</td>
                             <td>{{niveau.niveau4.name}}</td>
                             <td>
-                                <a href="" class="btn btn-warning bg-warning text-center" title="Modifier">
+                                <a href="{% url 'edit_n5' niveau.id %}" class="btn btn-warning bg-warning text-center" title="Modifier">
                                       <i style="font-size: 15px;" class="fa-solid fa-pencil"></i>
                                 </a> 
-                                <a href="" class="btn btn-danger bg-danger text-center" title="Supprimer">
-                                      <i style="font-size: 15px;" class="fa-solid fa-trash"></i>
-                                </a>
                             </td>
                         </tr>
                         {% endfor %}

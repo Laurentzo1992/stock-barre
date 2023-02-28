@@ -32,8 +32,10 @@ INSTALLED_APPS = [
     "fontawesomefree",
     "bootstrap5",
     "django_htmx",
-    "django_cleanup.apps.CleanupConfig",
+    "django_cleanup",
     "crispy_forms",
+    "phone_field",
+    "phonenumber_field",
 ]
 
 MIDDLEWARE = [
@@ -137,3 +139,8 @@ CRISPY_TEMPLATE_PACK = "bootstrap5"
 LOGIN_URL = 'login_user'
 
 LOGIN_REDIRECT_URL = 'index'
+
+
+PHONENUMBER_DEFAULT_FORMAT = "INTERNATIONAL"
+PHONENUMBER_DB_FORMAT = "NATIONAL"
+PHONENUMBER_DEFAULT_REGION = "BF"
