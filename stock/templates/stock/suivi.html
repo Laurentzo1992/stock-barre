@@ -7,7 +7,7 @@
 {% block search %}
 <div class="row mb-3 mx-2">
     <div class="col">
-      <input type="text" class="form-control" placeholder="First name" aria-label="First name">
+        <input type="text" class="form-control" name="code" id="search-input" placeholder="Tapez ici pour rechercher">
     </div>
 </div>
 {% endblock search %}
@@ -68,6 +68,20 @@
       </div>
     </div>
 </div>
+
+<script>
+    // Sélectionner le champ de recherche
+    var $searchField = $('#search-input');
+    // Écouter l'événement de saisie de recherche
+    $searchField.on('input', function() {
+      // Récupérer la valeur de recherche
+      var value = $searchField.val().toLowerCase();
+      // Filtrer les éléments du tableau en fonction de la valeur de recherche
+      $('#example tbody tr').filter(function() {
+        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+      });
+    });
+  </script>
 
 
 {% endblock main %}
