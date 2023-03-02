@@ -17,6 +17,7 @@ from django.utils import timezone
 import uuid
 import datetime
 from datetime import date
+from django.views.generic import View
 
 
 
@@ -55,7 +56,7 @@ def login_user(request):
                 #On le redirige vers une page ici c'est index.html
                 return redirect('index')
             #si le formulaire n'est pas correct e.i si des les données dont incorrecte informé le user
-        message = 'Invalides veuillez verifiez votre nom d\'utilisateur ou votre mot de passe'
+        message = 'Invalide! verifiez votre nom d\'utilisateur ou votre mot de passe'
     return render(request, 'stock/login_user.html', context={'form': form, 'message': message})
 
 
@@ -442,7 +443,7 @@ def commande(request):
         suppliers = Client.objects.all()
         transports = Transporteur.objects.all()
         prefixe = 'CMD-'
-        idc = str(uuid.uuid4().int)[:10]
+        idc = f'{Commande.objects.count()+1:05d}'
         suffixe = date.today()
         sep = '-'
         num_commande = prefixe + idc + sep  + str(suffixe)
@@ -455,7 +456,7 @@ def commande(request):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def livraison(request):
     livraisons = Livraison.objects.filter(livre=False).order_by('-id')
-    paginator = Paginator(livraisons, 5)
+    paginator = Paginator(livraisons, 6)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     context={"page_obj":page_obj}
@@ -470,11 +471,20 @@ def edit_livraison(request, livraison_id):
     form = LivraisonForm(request.POST or None, instance=livraison)
     if form.is_valid():
         livraison = form.save(commit=False)
+        commande.save()
         livraison.livre = True
         livraison.save()
-        commande.save()
+        messages.success(request, 'Votre commande a été livré avec succès!')
         return redirect('suivi')
     return render(request, 'stock/edit_livraison.html', {'form': form, 'livraison': livraison})
+
+
+
+@login_required
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def edit_livraison2(request, livraison_id):
+    livraison = get_object_or_404(Livraison, id=livraison_id)
+    return render(request, 'stock/edit_livraison2.html', {'livraison': livraison})
 
 
 
@@ -494,10 +504,14 @@ def produit(request):
 @login_required
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def add_product(request):
+    year = datetime.datetime.now().year
+    code = f'ARTI-{Product.objects.count()+1:09d}-{year}'
     if request.method=="POST":
         form = ProductForm(request.POST)
         if form.is_valid():
-            form.save()
+            product = form.save(commit=False)
+            product.code = code
+            product.save()
             pro_code = form.cleaned_data.get('code')
             nom_pro = form.cleaned_data.get('name')
             messages.success(request, f"L'élément {nom_pro} code {pro_code}  ajouté avec succes !")
@@ -506,7 +520,7 @@ def add_product(request):
             messages.error(request, "Veuillez verifiez svp l'article existe déja!!")
             return render(request, 'stock/add_product.html', {"form":form})
     else:
-        form = ProductForm()
+        form = ProductForm(initial={'code': code})
         return render(request, 'stock/add_product.html', {"form":form})
     
 @login_required
@@ -534,6 +548,19 @@ def delete_product(request, id):
         return redirect("produit")
     return render(request, 'stock/delete_product.html', {"product":product})
 
+
+
+class SearchProductView(View):
+    def get(self, request, *args, **kwargs):
+        code = request.GET.get('code')
+        products = Product.objects.filter(code__icontains=code)
+        data = {
+            'products': list(products.values('name'))
+        }
+        return JsonResponse(data)
+
+
+
     
 @login_required
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
@@ -544,6 +571,25 @@ def stock_in(request):
     page_obj = paginator.get_page(page_number)
     context={"page_obj":page_obj}
     return render(request, 'stock/stock_in.html', context)
+
+
+
+
+
+def stock_barre(request):
+    barcode = request.GET.get('barcode')
+    if barcode:
+        product = get_object_or_404(Product, barcode=barcode)
+        data = {
+            'name': product.name,
+            'code': product.code,
+            'stock': product.stock,
+            'description': product.description,
+            'sous_contenaire': str(product.sous_contenaire),
+            'barcode': product.barcode.url if product.barcode else '',
+        }
+        return JsonResponse(data)
+    return render(request, 'stock/stock_barre.html')
 
 
 

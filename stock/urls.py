@@ -1,6 +1,7 @@
 from django.urls import path
 from . import views
 from .views import change_password
+from stock.views import SearchProductView
 
 
 urlpatterns = [
@@ -19,12 +20,15 @@ urlpatterns = [
     path('commande', views.commande, name='commande'),
     path('livraison', views.livraison, name='livraison'),
     path('edit_livraison/<int:livraison_id>', views.edit_livraison, name='edit_livraison'),
+    path('edit_livraison2/<int:livraison_id>', views.edit_livraison2, name='edit_livraison2'),
     path('suivi', views.suivi, name='suivi'),
     path('produit', views.produit, name='produit'),
+    path('search_product/', SearchProductView.as_view(), name='search_product'),
     path('add_product', views.add_product, name='add_product'),
     path('produit/edit_product/<int:id>', views.edit_product, name='edit_product'),
     path('produit/delete_product/<int:id>', views.delete_product, name='delete_product'),
     path('stock_in', views.stock_in, name='stock_in'),
+    path('stock_barre', views.stock_barre, name='stock_barre'),
     path('add_stock', views.add_stock, name='add_stock'),
     path('niveau', views.niveau, name='niveau'),
     path('create_n1', views.create_n1, name='create_n1'),

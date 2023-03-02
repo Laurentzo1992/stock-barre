@@ -9,11 +9,21 @@
 <span class="d-none d-sm-inline text-white"> <i class="fas fa-plus text-white"></i></span>
 </a>
 
+{% block search %}
+
+<div class="row mb-3 mx-2">
+    <div class="col">
+      <input type="text" class="form-control" name="code" id="search-input" placeholder="Tapez ici pour rechercher un">
+    </div>
+</div>
+
+
+{% endblock search %}
 
 <div class="container d-flex flex-column mb-5">
     {% block dashboad %}
    
-   {% endblock dashboad %}
+    {% endblock dashboad %}
    
     <div class="row">
         <table id="example" class="display table table-striped table-hover">
@@ -68,4 +78,43 @@
 </div>
 
 
+<script>
+    // Sélectionner le champ de recherche
+    var $searchField = $('#search-input');
+    // Écouter l'événement de saisie de recherche
+    $searchField.on('input', function() {
+      // Récupérer la valeur de recherche
+      var value = $searchField.val().toLowerCase();
+      // Filtrer les éléments du tableau en fonction de la valeur de recherche
+      $('#example tbody tr').filter(function() {
+        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+      });
+    });
+  </script>
+  
+
+{% comment %} <script>
+    $(document).ready(function() {
+        var searchInput = $('#search-input');
+    
+        searchInput.on('input', function() {
+            var code = searchInput.val();
+            $.ajax({
+                url: '/search_product/',
+                data: {
+                    'code': code
+                },
+                dataType: 'json',
+                success: function(data) {
+                    var results = $('#example');
+                    results.empty();
+                    $.each(data.products, function(index, product) {
+                        results.append('<td>' + product.name + '</td>');
+                    });
+                }
+            });
+        });
+    });
+    
+</script> {% endcomment %}
 {% endblock main %}

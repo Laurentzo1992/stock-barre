@@ -3,7 +3,14 @@
 
 
 {% block main %} 
-	
+
+{% block search %}
+<div class="row mb-3 mx-2">
+    <div class="col">
+      <input type="text" class="form-control" placeholder="First name" aria-label="First name">
+    </div>
+</div>
+{% endblock search %}
 
 <div class="container d-flex flex-column mb-5">
     {% block dashboad %}
@@ -16,6 +23,7 @@
                 <tr>
                     <th>Numero livraison</th>
                     <th> Date Commande</th>
+                    <th> Date livraison</th>
                     <th> Transporteur</th>
                     <th> Status </th>
                 </tr>
@@ -25,6 +33,7 @@
                 <tr>
                     <td>{{livraison.num_livraison}}</td>
                     <td>{{livraison.create_at}}</td>
+                    <td>{{livraison.date_livaison}}</td>
                     <td>{{livraison.commande.transport}}</td>
                     {% if livraison.livre is False %}
                     <td class="text-success font-weight-bold"><i style="font-size: 15px;" class="fa-solid fa-circle"></i> &nbsp; &nbsp; En cours</td>
@@ -32,7 +41,7 @@
                     <td class="text-success font-weight-bold"><i style="font-size: 15px;" class="fa-solid fa-check-circle"></i>&nbsp;&nbsp;Livré</td>
                     {% endif %}
                     <td>
-                        <a href="{% url 'edit_livraison' livraison.id %}" class="btn btn-info bg-info text-center text-white" title="Modifier">
+                        <a href="{% url 'edit_livraison2' livraison.id %}" class="btn btn-info bg-info text-center text-white" title="Modifier">
                               <i style="font-size: 15px;" class="fa-solid fa-eye"></i>
                         </a> 
                     </td>

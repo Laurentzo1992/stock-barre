@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% block title %} Suivi {% endblock %}
+{% block main %}
+
+
+
+
+
+
+
+<div class="card">
+    <div class="card-header text-center font-italic font-weight-bold">
+       <span class="text-info font-italic font-weight-bold">Commande numero :  {{livraison.num_livraison}}</span>
+    </div>
+
+    <div class="row mb-3 mt-3 mx-4 text-danger font-italic font-weight-bold">
+        <label for="colFormLabelLg" class="col-sm-2 col-form-label">Date livraison</label>
+        <div class="col-sm-10">
+          <input type="text" class="form-control" value="  {{livraison.date_livaison}}" readonly>
+        </div>
+    </div>
+    <div class="row mb-3 mt-3 mx-4 text-danger font-italic font-weight-bold">
+        <label for="colFormLabelLg" class="col-sm-2 col-form-label"> Date de commande</label>
+        <div class="col-sm-10">
+          <input type="email" class="form-control" id="colFormLabelLg"  value="{{livraison.create_at}}" readonly>
+        </div>
+    </div>
+    <div class="row mb-3 mt-3 mx-4 text-danger font-italic font-weight-bold">
+        <label for="colFormLabelLg" class="col-sm-2 col-form-label">adresse de livraison</label>
+        <div class="col-sm-10">
+          <input type="email" class="form-control" id="colFormLabelLg"  value="{{livraison.commande.adresse_livraison}}" readonly>
+        </div>
+    </div>
+
+    <div class="row mb-3 mt-3 mx-4 text-danger font-italic font-weight-bold">
+        <label for="colFormLabelLg" class="col-sm-2 col-form-label">Client</label>
+        <div class="col-sm-10">
+          <input type="email" class="form-control" id="colFormLabelLg"  value=" {{livraison.commande.client}}" readonly>
+        </div>
+    </div>
+
+    <div class="row mb-3 mt-3 mx-4 text-danger font-italic font-weight-bold">
+        <label for="colFormLabelLg" class="col-sm-2 col-form-label">Transporté par </label>
+        <div class="col-sm-10">
+          <input type="email" class="form-control" id="colFormLabelLg"  value="{{livraison.commande.transport}}" readonly>
+        </div>
+    </div>
+
+
+    <div class="row mb-3 mt-3 mx-4 text-danger font-italic font-weight-bold">
+        <label for="colFormLabelLg" class="col-sm-2 col-form-label">Status</label>
+        <div class="col-sm-10">
+            {% if livraison.livre is True %}
+          <input type="email" class="form-control text-success font-italic font-weight-bold" id="colFormLabelLg"  value="Livré" readonly>
+          {% endif %}
+        </div>
+    </div>
+
+{% endblock main %}
+
+
+
+           
+   
+

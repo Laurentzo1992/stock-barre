@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% block title %} Stock-entré {% endblock %}
+
+
+{% block main %} 
+
+
+<div class="container d-flex flex-column mb-5">
+    {% block dashboad %}
+       
+    {% endblock dashboad %}
+   
+   <div class="container">
+    <h4 class="font-italic font-weight-bold text-info">Recherche de produit</h4>
+    <div class="form-group">
+      <input type="text" id="barcode" name="barcode" class="form-control" placeholder="Scannez le code-barres">
+    </div>
+    <div class="card">
+      <div class="card-body">
+        <h4 id="product-name"></h4>
+        <p id="product-description"></p>
+        <p><span id="product-stock"></span></p>
+      </div>
+    </div>
+  </div>
+
+
+
+
+  <script>
+    function searchProduct(code) {
+      $.ajax({
+        url: '/stock_barre/',
+        data: {
+          'code': code
+        },
+        dataType: 'json',
+        success: function (data) {
+          // Mettre à jour le contenu de la page avec les informations du produit
+          $('#product-name').text(data.name);
+          $('#product-description').text(data.description);
+          $('#product-stock').text(data.stock);
+        }
+      });
+    }
+  
+    $(document).ready(function () {
+      // Écouter l'événement de scan du code-barres
+      $(document).scannerDetection({
+        timeBeforeScanTest: 200, // temps avant de tester le scan suivant (en millisecondes)
+        avgTimeByChar: 30, // temps moyen entre chaque caractère du scan (en millisecondes)
+        onComplete: function (barcode) {
+          // Rechercher le produit correspondant
+          searchProduct(barcode);
+        }
+      });
+    });
+  </script>
+
+  
+
+{% endblock main %}
+

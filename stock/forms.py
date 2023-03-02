@@ -89,6 +89,10 @@ class LivraisonForm(forms.ModelForm):
     class Meta:
         model = Livraison
         fields = '__all__'
+        
+        widgets = {
+            'commande': forms.HiddenInput(),
+        }
          
          
         

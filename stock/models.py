@@ -5,6 +5,7 @@ from barcode.writer import ImageWriter
 from io import BytesIO
 from django.core.files import File
 from phonenumber_field.modelfields import PhoneNumberField
+import datetime
 
 
 
@@ -93,11 +94,14 @@ class Product(models.Model):
     
     def save(self, *args, **kwargs):
         Code128 = barcode.get_barcode_class('Code128')
-        ean = Code128(f'{self.code}{self.name}{self.sous_contenaire.name}', writer=ImageWriter())
+        ean = Code128(f'{self.code}-{self.sous_contenaire.name}', writer=ImageWriter())
         buffer = BytesIO()
         ean.write(buffer)
         self.barcode.save(f'{self.name}{self.code}.png', File(buffer), save=False)
         return super().save(*args, **kwargs)
+
+
+
     
 
 class Operation(models.Model):

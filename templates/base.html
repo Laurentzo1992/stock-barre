@@ -118,6 +118,11 @@
 								</a>
 							</li>
 							<li class="nav-item">
+								<a href="{% url 'stock_barre' %}" class="nav-link align-middle px-0">
+									<i class="fa-solid fa-eye text-white"></i> <span class="ms-1 d-none d-sm-inline text-white">Lecture</span>
+								</a>
+							</li>
+							<li class="nav-item">
 								<a href="{% url 'commande' %}" class="nav-link align-middle px-0">
 									<i class="fa-solid fa-server text-white"></i> <span class="ms-1 d-none d-sm-inline text-white">Commande</span>
 								</a>
@@ -149,6 +154,10 @@
 				<div class="col py-3">
 			
 					{% block main %} 
+
+					{% block search %}
+					
+					{% endblock search %}
 					
 					{% endblock main %}
 
