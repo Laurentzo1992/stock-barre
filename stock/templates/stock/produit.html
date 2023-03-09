@@ -34,7 +34,16 @@
                     <th>Code bare</th>
                     <th> stock</th>
                     <th>Niveau</th>
-                    <th style="width: 10%;">Action</th>
+                    <th style="width: 10%;">
+                        <a href="{% url 'export_products_csv' %}" class="btn btn-info bg-info" title="Exporter">
+                            <i style="font-size: 11px;" class="fa-solid fa-file-csv"></i>
+                        </a>
+                        &nbsp;&nbsp;
+                        <a href="{% url 'export_products_excel' %}" class="btn btn-info bg-info" title="Exporter">
+                            <i style="font-size: 11px;" class="fa-solid fa-file-excel"></i>
+                        </a>
+
+                    </th>
                 </tr>
             </thead>
             <tbody>

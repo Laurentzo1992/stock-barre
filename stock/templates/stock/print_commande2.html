@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% block title %} imprresion commande {% endblock %}
+
+
+{% block main %}
+<table class="table" id ="main">
+    <tr class="font-italic font-weight-bold text-success text-center">
+        <td> Bon de commande </td>
+    </tr>
+    <tr>
+        <td>
+           <table class="table">
+                    <tr>
+                        <td><span class="font-italic font-weight-bold text-secondary"> Numero de commande </span> : {{ma_commande.num_commande}}</td>
+                    </tr>
+                    <tr>
+                        <td><span class="font-italic font-weight-bold text-secondary">Adresse de livraison </span> : {{ma_commande.adresse_livraison}}</td>
+                    </tr>
+                    <tr>
+                        <td><span class="font-italic font-weight-bold text-secondary">Client </span> : {{ma_commande.client}}</td>
+                    </tr>
+                    <tr>
+                        <td><span class="font-italic font-weight-bold text-secondary">Date de la commande </span> : {{ma_commande.date_commande}}</td>
+                    </tr>
+                    <tr>
+                        <td><span class="font-italic font-weight-bold text-secondary">Transporteur </span> : {{ma_commande.transport}} </td>
+                    </tr>
+            </table>
+        </td>
+        <td>
+           <table class="table">
+                <thead>
+                    <tr>
+                        <th> Ordre </th>
+                        <th> Article </th>
+                        <th>Quantité</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for article_commande  in article_commandes  %}
+                    <tr class="font-italic font-weight-bold">
+                        <td scope="row">{{forloop.counter}}</td>
+                        <td>{{article_commande.article}}</td>
+                        <td>{{article_commande.quantite}}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </td>
+    </tr>
+</table>
+
+
+
+<button onclick="printData()" class="btn btn-primary mt-3 float-right"><i style="font-size: 25px;" class="fa-solid fa-print"></i></button>
+
+
+
+<script>
+    function printData() {
+        var divToPrint = document.getElementById("main"); 
+        newWin = window.open("");
+        newWin.document.write(divToPrint.outerHTML);
+        newWin.print();
+        newWin.close();
+    }
+
+</script>
+
+
+
+{% endblock main %}

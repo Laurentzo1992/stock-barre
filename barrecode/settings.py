@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     "crispy_forms",
     "phone_field",
     "phonenumber_field",
+    "athentication",
 ]
 
 MIDDLEWARE = [
@@ -74,12 +75,38 @@ WSGI_APPLICATION = 'barrecode.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'barrecode',
+        'USER': 'root',
+        'PASSWORD': '',
+        'HOST': 'localhost',
+        'PORT': '3306',
     }
 }
+
+
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'barrecode',
+#         'USER': 'root',
+#         'PASSWORD': 'admin',
+#         'HOST': 'localhost',
+#         'PORT': '5432',
+#     }
+# }
+
 
 
 # Password validation
@@ -135,6 +162,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
 
+AUTH_USER_MODEL = 'athentication.User'
 
 LOGIN_URL = 'login_user'
 

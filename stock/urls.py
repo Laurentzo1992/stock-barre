@@ -1,14 +1,10 @@
 from django.urls import path
 from . import views
-from .views import change_password
+from .views import ExportProductsCSVView, ExportProductsExcelView
 from stock.views import SearchProductView
 
-
 urlpatterns = [
-    path('', views.login_user, name='login_user'),
     path('index', views.index, name='index'),
-    path('logout_user', views.logout_user, name='logout_user'),
-    path('change_password', views.change_password, name='change_password'),
     path('client', views.client, name='client'),
     path('add_client', views.add_client, name='add_client'),
     path('edit_client/<int:id>', views.edit_client, name='edit_client'),
@@ -18,6 +14,8 @@ urlpatterns = [
     path('edit_transport/<int:id>', views.edit_transport, name='edit_transport'),
     path('delete_transport/<int:id>', views.delete_transport, name='delete_transport'),
     path('commande', views.commande, name='commande'),
+    path('print_commande/<int:pk>', views.print_commande, name='print_commande'),
+    path('print_commande2/<int:pk>', views.print_commande2, name='print_commande2'),
     path('livraison', views.livraison, name='livraison'),
     path('edit_livraison/<int:livraison_id>', views.edit_livraison, name='edit_livraison'),
     path('edit_livraison2/<int:livraison_id>', views.edit_livraison2, name='edit_livraison2'),
@@ -27,7 +25,10 @@ urlpatterns = [
     path('add_product', views.add_product, name='add_product'),
     path('produit/edit_product/<int:id>', views.edit_product, name='edit_product'),
     path('produit/delete_product/<int:id>', views.delete_product, name='delete_product'),
+    path('export/csv/', ExportProductsCSVView.as_view(), name='export_products_csv'),
+    path('export/excel/', ExportProductsExcelView.as_view(), name='export_products_excel'),
     path('stock_in', views.stock_in, name='stock_in'),
+    path('operation_print/<int:id>', views.operation_print, name='operation_print'),
     path('stock_barre', views.stock_barre, name='stock_barre'),
     path('add_stock', views.add_stock, name='add_stock'),
     path('niveau', views.niveau, name='niveau'),

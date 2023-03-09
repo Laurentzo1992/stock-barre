@@ -1,11 +1,8 @@
 from . import forms
-from .forms import ProductForm, ClientForm, LivraisonForm, TransporteurForm ,LoginForm, Niveau1Form, Niveau2Form, Niveau3Form, Niveau4Form, Niveau5Form
-from django.contrib.auth.forms import PasswordChangeForm
+from .forms import ProductForm, ClientForm, LivraisonForm, TransporteurForm , Niveau1Form, Niveau2Form, Niveau3Form, Niveau4Form, Niveau5Form
 from django.shortcuts import redirect, render, get_object_or_404
-from django.contrib.auth import login, authenticate, logout, get_user_model, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from  django.views.decorators.cache import cache_control 
-User = get_user_model()
 from  django.contrib import messages
 from django.http import HttpResponseRedirect, HttpResponse, FileResponse, JsonResponse
 from django.core.paginator import Paginator
@@ -15,6 +12,8 @@ from escpos.printer import Usb
 from django.db import transaction, models
 from django.utils import timezone
 import uuid
+import csv
+import openpyxl
 import datetime
 from datetime import date
 from django.views.generic import View
@@ -32,58 +31,6 @@ def index(request):
     context={"articles":articles, "articles_commandes":articles_commandes, "articles_livres":articles_livres}
     return render(request, 'stock/index.html', context)
 
-
-def login_user(request):
-    #crée une instance du formulaire
-    form = forms.LoginForm()
-    #definir une variable message pour informer le user si ses identifiant sont iccorecte
-    message = ''
-    #Test l'action si post (envoi de donnée)
-    if request.method == 'POST':
-        # On recupère les données dans l'instance du formulaire
-        form = forms.LoginForm(request.POST)
-        #Verifie si le formulaire est valide
-        if form.is_valid():
-            #On authentifie l'instance du user avec la methode authenticate
-            user = authenticate(
-                username=form.cleaned_data['username'],
-                password=form.cleaned_data['password'],
-            )
-            #Test si le usernme  envoyé du fomrulair ,'est pas null
-            if user is not None:
-                #Etablie une connection de lutilisateur
-                login(request, user)
-                #On le redirige vers une page ici c'est index.html
-                return redirect('index')
-            #si le formulaire n'est pas correct e.i si des les données dont incorrecte informé le user
-        message = 'Invalide! verifiez votre nom d\'utilisateur ou votre mot de passe'
-    return render(request, 'stock/login_user.html', context={'form': form, 'message': message})
-
-
-
-def logout_user(request):
-    #deconnection du user avec la methode logout 
-    logout(request)
-    return redirect('login_user')
-
-
-@login_required
-@cache_control(no_cache=True, must_revalidate=True, no_store=True)
-def change_password(request):
-    if request.method == 'POST':
-        form = PasswordChangeForm(request.user, request.POST)
-        if form.is_valid():
-            user = form.save()
-            update_session_auth_hash(request, user)  # Important!
-            messages.success(request, 'Votre mot à été changé avec succès')
-            return redirect('index')
-        else:
-            messages.error(request, 'Erreur veuillez verifiez vos identifiants antérieurs')
-    else:
-        form = PasswordChangeForm(request.user)
-    return render(request, 'stock/change_password.html', {
-        'form': form
-    })
 
 
 @login_required
@@ -410,9 +357,11 @@ def commande(request):
                                             transport=transport
                                             )
         selected_products = request.POST.getlist('articles')
+        number = 0
         with transaction.atomic():
             for article_id in selected_products:
-                quantity = int(request.POST.get('quantity'))
+                number += 1
+                quantity = int(request.POST.get(f'quantity-{number}'))
                 article = Product.objects.get(id=article_id)
                 # Vérifiez si la quantité demandée est disponible
                 if article.stock >= quantity:
@@ -452,11 +401,37 @@ def commande(request):
 
 
 
+
+@login_required
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def print_commande(request, pk):
+    commande_print = Livraison.objects.get(pk=pk)
+    com_id = commande_print.id
+    ma_commande = get_object_or_404(Commande, id=com_id)
+    article_commandes = LigneCommande.objects.filter(commande=ma_commande)
+    nbr_items = article_commandes.count()
+    context={"article_commandes":article_commandes, "ma_commande":ma_commande, "nbr_items":nbr_items}
+    return render(request, 'stock/print_commande.html', context)
+
+
+
+@login_required
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def print_commande2(request, pk):
+    commande_print = Livraison.objects.get(pk=pk)
+    com_id = commande_print.id
+    ma_commande = get_object_or_404(Commande, id=com_id)
+    article_commandes = LigneCommande.objects.filter(commande=ma_commande)
+    context={"article_commandes":article_commandes, "ma_commande":ma_commande}
+    return render(request, 'stock/print_commande2.html', context)
+
+
+
 @login_required
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def livraison(request):
     livraisons = Livraison.objects.filter(livre=False).order_by('-id')
-    paginator = Paginator(livraisons, 6)
+    paginator = Paginator(livraisons, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     context={"page_obj":page_obj}
@@ -501,6 +476,24 @@ def produit(request):
     return render(request, 'stock/produit.html', context)
 
 
+
+def stock_barre(request):
+    barcode = request.GET.get('barcode')
+    if barcode:
+        product = get_object_or_404(Product, barcode=barcode)
+        data = {
+            'name': product.name,
+            'code': product.code,
+            'stock': product.stock,
+            'description': product.description,
+            'sous_contenaire': str(product.sous_contenaire),
+            'barcode': product.barcode.url if product.barcode else '',
+        }
+        return JsonResponse(data)
+    return render(request, 'stock/stock_barre.html')
+
+
+
 @login_required
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def add_product(request):
@@ -526,7 +519,7 @@ def add_product(request):
 @login_required
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def edit_product(request, id):
-    product = Product.objects.get(id=id)
+    product = get_object_or_404(Product, id=id)
     if request.method == 'POST':
         form = ProductForm(request.POST,request.FILES, instance=product)
         if form.is_valid():
@@ -536,6 +529,8 @@ def edit_product(request, id):
     else:
         form = ProductForm(instance=product)
     return render(request, 'stock/edit_product.html', {'form':form})
+
+
 
 
 @login_required
@@ -573,57 +568,90 @@ def stock_in(request):
     return render(request, 'stock/stock_in.html', context)
 
 
-
-
-
-def stock_barre(request):
-    barcode = request.GET.get('barcode')
-    if barcode:
-        product = get_object_or_404(Product, barcode=barcode)
-        data = {
-            'name': product.name,
-            'code': product.code,
-            'stock': product.stock,
-            'description': product.description,
-            'sous_contenaire': str(product.sous_contenaire),
-            'barcode': product.barcode.url if product.barcode else '',
-        }
-        return JsonResponse(data)
-    return render(request, 'stock/stock_barre.html')
-
-
-
-@login_required
+@login_required 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def add_stock(request):
     if request.method == 'POST':
+        supplier_id = request.POST.get('fournisseur')
+        supplier = Client.objects.get(pk=supplier_id)
+        operation = Operation.objects.create(fournisseur=supplier
+                                           )
+        number = 0
         selected_products = request.POST.getlist('products')
-        for product_id in selected_products:
-            quantity = int(request.POST.get('quantity'))
-            supplier_id = request.POST.get('fournisseur')
-            supplier = Client.objects.get(pk=supplier_id)
-            product = Product.objects.get(pk=product_id)
-            if quantity >= 1:
-                product.stock += quantity
-                product.save()
-                operation = Operation(
-                    products=product,
-                    quantity=quantity,
-                    fournisseur=supplier
-                    )
-                operation.save()
-                messages.success(request, f"Le stock {product} mis à jour avec succes !")
-            else:
-                messages.error(request, f" veuillez verifiez la quantité saisie")
+        with transaction.atomic():
+            for product_id in selected_products:
+                number += 1
+                quantity = int(request.POST.get(f'quantity-{number}'))
+                product = Product.objects.get(id=product_id)
+                # Vérifiez si la quantité demandée est disponible
+                if quantity >= 1:
+                    product.stock = models.F('stock') + quantity
+                    product.save()
+                    LigneOperation.objects.create(operation=operation,
+                                                     product=product,
+                                                     quantity=quantity)
+                   
+                else:
+                        # Si la quantité n'est pas disponible, annulez la commande et affichez un message d'erreur
+                    operation.delete()
+                    messages.error(request, f"La quantité {product.code} doit être superieure à au moin 1 ")
+
+                    return redirect('stock_in')
+
             
+
+        messages.success(request, 'Votre stock à été mise à jour avec succès!')
         return redirect('stock_in')
 
-    products = Product.objects.all()
-    suppliers = Client.objects.all()
-    context = {'products': products, 'suppliers': suppliers}
-    return render(request, 'stock/add_stock.html', context)
+    else:
+        products = Product.objects.all()
+        suppliers = Client.objects.all()
+        context = {'products': products, 'suppliers': suppliers}
+        return render(request, 'stock/add_stock.html', context)
+    
+    
+    
+# @login_required
+# @cache_control(no_cache=True, must_revalidate=True, no_store=True)
+# def add_stock(request):
+#     if request.method == 'POST':
+#         selected_products = request.POST.getlist('products')
+#         for product_id in selected_products:
+#             quantity = int(request.POST.get('quantity'))
+#             supplier_id = request.POST.get('fournisseur')
+#             supplier = Client.objects.get(pk=supplier_id)
+#             product = Product.objects.get(pk=product_id)
+#             if quantity >= 1:
+#                 product.stock += quantity
+#                 product.save()
+#                 operation = Operation(
+#                     products=product,
+#                     quantity=quantity,
+#                     fournisseur=supplier
+#                     )
+#                 operation.save()
+#                 messages.success(request, f"Le stock {product} mis à jour avec succes !")
+#             else:
+#                 messages.error(request, f" veuillez verifiez la quantité saisie")
+            
+#         return redirect('stock_in')
+
+#     products = Product.objects.all()
+#     suppliers = Client.objects.all()
+#     context = {'products': products, 'suppliers': suppliers}
+#     return render(request, 'stock/add_stock.html', context)
 
  
+@login_required
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def operation_print(request, id):
+    op_id = Operation.objects.get(id=id)
+    operations_lignes = LigneOperation.objects.filter(operation_id=op_id)
+    context={"operations_lignes":operations_lignes, "op_id":op_id}
+    return render(request, 'stock/operation_print.html', context)
+
+
+
 
 @login_required
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
@@ -636,50 +664,93 @@ def suivi(request):
     return render(request, 'stock/suivi.html', context)
 
 
-@login_required
-@cache_control(no_cache=True, must_revalidate=True, no_store=True)
-def generate_barcode(product_number):
-    #Crée un objet de code-barres Code128
-    barcode = Code128(product_number)
-    #Renvoie les données de code-barres en format binaire
-    return barcode.get_barcode()
+
+
+class ExportProductsCSVView(View):
+    
+    def get(self, request, *args, **kwargs):
+        products = Product.objects.all()
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="products.csv"'
+
+        writer = csv.writer(response)
+        writer.writerow(['ID', 'Code', 'Name', 'Stock', 'Niveau', 'Description'])
+
+        for product in products:
+            writer.writerow([product.id, product.code, product.name, product.stock, product.sous_contenaire, product.description])
+
+        return response
 
 
 
-@login_required
-@cache_control(no_cache=True, must_revalidate=True, no_store=True)
-def print_label(product):
-    #Crée un objet d'imprimante USB
-    printer = Usb(0x0416, 0x5011, 0, profile="POS-5890")
-    #Configure l'imprimante pour une étiquette de 50 mm de largeur
-    printer.set("CENTER")
-    printer.set("SIZE", 1, 1)
-    printer.set("GAP", 2)
-    #Imprime le nom du produit
-    printer.text(product.name + "\n")
-    #Génère le code-barres et l'imprime
-    barcode_data = generate_barcode(product.number)
-    printer.barcode(barcode_data, "CODE128", 64, 2, '', '')
-    #Imprime le numéro de produit et la quantité
-    printer.text("Product number: " + product.number + "\n")
-    printer.text("Quantity: " + str(product.quantity) + "\n")
-    #Coupe le papier pour terminer l'étiquette
-    printer.cut()
-    #Ferme l'objet d'imprimante USB
-    printer.close()
-    return HttpResponse("Label printed successfully.")
+
+class ExportProductsExcelView(View):
+    
+    def get(self, request, *args, **kwargs):
+        products = Product.objects.all()
+
+        workbook = openpyxl.Workbook()
+        worksheet = workbook.active
+        worksheet.title = "Products"
+
+        # Écrire les en-têtes de colonne
+        worksheet.cell(row=1, column=1, value="ID")
+        worksheet.cell(row=1, column=2, value="Code")
+        worksheet.cell(row=1, column=3, value="Name")
+        worksheet.cell(row=1, column=4, value="Stock")
+        worksheet.cell(row=1, column=5, value="Niveau")
+        worksheet.cell(row=1, column=6, value="Description")
+        # Écrire les données des produits
+        row_num = 2
+        for product in products:
+            worksheet.cell(row=row_num, column=1, value=product.id)
+            worksheet.cell(row=row_num, column=2, value=product.code)
+            worksheet.cell(row=row_num, column=3, value=product.name)
+            worksheet.cell(row=row_num, column=4, value=product.stock)
+            worksheet.cell(row=row_num, column=5, value=product.sous_contenaire.name)
+            worksheet.cell(row=row_num, column=6, value=product.description)
+            row_num += 1
+        response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        response['Content-Disposition'] = 'attachment; filename="products.xlsx"'
+        workbook.save(response)
+        return response
+
+
+
+# @login_required
+# @cache_control(no_cache=True, must_revalidate=True, no_store=True)
+# def print_label(product):
+#     #Crée un objet d'imprimante USB
+#     printer = Usb(0x0416, 0x5011, 0, profile="POS-5890")
+#     #Configure l'imprimante pour une étiquette de 50 mm de largeur
+#     printer.set("CENTER")
+#     printer.set("SIZE", 1, 1)
+#     printer.set("GAP", 2)
+#     #Imprime le nom du produit
+#     printer.text(product.name + "\n")
+#     #Génère le code-barres et l'imprime
+#     barcode_data = generate_barcode(product.number)
+#     printer.barcode(barcode_data, "CODE128", 64, 2, '', '')
+#     #Imprime le numéro de produit et la quantité
+#     printer.text("Product number: " + product.number + "\n")
+#     printer.text("Quantity: " + str(product.quantity) + "\n")
+#     #Coupe le papier pour terminer l'étiquette
+#     printer.cut()
+#     #Ferme l'objet d'imprimante USB
+#     printer.close()
+#     return HttpResponse("Label printed successfully.")
     
 
 
-@login_required
-@cache_control(no_cache=True, must_revalidate=True, no_store=True)
-def product_label(request, product_id):
-    #Récupère l'objet Produit correspondant à l'ID donné
-    product = Product.objects.get(pk=product_id)
-    #Imprime une étiquette pour le produit
-    print_label(product)
-    #Redirige l'utilisateur vers la page de détails du produit
-    return redirect('product_detail', product_id=product_id)
+# @login_required
+# @cache_control(no_cache=True, must_revalidate=True, no_store=True)
+# def product_label(request, product_id):
+#     #Récupère l'objet Produit correspondant à l'ID donné
+#     product = Product.objects.get(pk=product_id)
+#     #Imprime une étiquette pour le produit
+#     print_label(product)
+#     #Redirige l'utilisateur vers la page de détails du produit
+#     return redirect('product_detail', product_id=product_id)
 
 
     

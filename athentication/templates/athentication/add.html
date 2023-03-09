@@ -1,0 +1,56 @@
+{% extends 'index.html' %}
+
+{% load crispy_forms_tags %}
+{% load bootstrap_icons %}
+{% comment %} {% load django_bootstrap5 %} {% endcomment %}
+{% block content %}{% endblock content %}
+
+{% block main%}
+
+           
+   <div class="container mt-3" style="width: 95%; font-size: 14px">
+      
+      <form method="POST" class="card p-3 mt-5" {% block action %} action="{% url 'add_user' %}" {% endblock action %} autocomplete="off" enctype="multipart/form-data"> 
+            {% csrf_token %}
+
+                <span class="btn btn-secondary mb-4" style="cusor: default;">
+
+                </span>
+            {% comment %} {% bootstrap_form form %} {% endcomment %}
+
+         <div class="row">
+            <div class="col-3">{{form.username|as_crispy_field}}</div>
+            <div class="col-3">{{form.first_name|as_crispy_field}}</div>
+            <div class="col-3">{{form.last_name|as_crispy_field}}</div>
+            <div class="col-3">{{form.email|as_crispy_field}}</div>
+         </div>
+
+         <div class="row">
+            <div class="col-3">{{form.password1|as_crispy_field}}</div>
+            <div class="col-3">{{form.password2|as_crispy_field}}</div>
+            <div class="col-3">{{form.groups|as_crispy_field}}</div>
+            <div class="col-3">{{form.photo|as_crispy_field}}</div>
+         </div>
+
+         <div class="row">
+            {{form.user_permissions|as_crispy_field}}
+         </div>
+
+           <div class="row">
+            <div class="col-4">{{form.is_staff|as_crispy_field}}</div>
+            <div class="col-4">{{form.is_active|as_crispy_field}}</div>
+            <div class="col-4">{{form.is_superuser|as_crispy_field}}</div>
+         </div>
+
+         <div class="mt-4" style="width: 100p%;">
+            <button style= "font-size: 15px;" type="submit" class="btn btn-success mb-3">
+            <i class="fas fa-plus"></i>&nbsp;&nbsp; Add User
+            </button>
+            <a style= "font-size: 15px;" href="{% url 'users' %}" type="button" class="btn btn-outline-danger mb-3 ms-2" style="wdith: 50px;" title="Close">
+                  <i class="fas fa-times"></i>
+            </a>
+         </div> 
+      </form>
+   </div>
+
+{% endblock main%}

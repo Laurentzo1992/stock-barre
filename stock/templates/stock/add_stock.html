@@ -11,7 +11,6 @@
             <div class="col-12 p-2 mt-2 text-info font-weight-bold font-italic d-flex flex-column">
                 <label for="fournisseur"> Fournisseurs </label>
                 <select name="fournisseur" class="form-control" id="fournisseur">
-                    <option>Choisir le fournisseur ... </option>
                     {% for fournis in suppliers %}
                     <option value="{{fournis.id}}">{{forloop.counter}}-{{fournis.rasion_sociale}}</option>
                     {% endfor %}
@@ -31,7 +30,6 @@
                     <div class="col-4  p-2">
                         <label for="article-1">Article</label>
                         <select name="products" class="form-control" id="article-1">
-                            <option> Choisir ... </option>
                             {% for product in products %}
                             <option value="{{product.id}}">{{forloop.counter}}-{{product.name}}</option>
                             {% endfor %}
@@ -39,7 +37,7 @@
                     </div>
                     <div class="col-4 p-2 text-info font-weight-bold font-italic">
                         <label for="qty-1"> Quantité</label>
-                        <input required name="quantity" type="number" min="1" step="0.1" class="form-control" id="qty-1">
+                        <input required name="quantity-1" type="number" min="1" step="0.1" class="form-control" id="qty-1">
             
                     </div>
                 </div>
@@ -75,7 +73,6 @@
                             <div class="col-4  p-2">
                                 <label for="article-${number}">Article</label>
                                 <select name="products" class="form-control" id="article-${number}">
-                                    <option> Choisir ... </option>
                                     {% for product in products %}
                                     <option value="{{product.id}}">{{forloop.counter}}-{{product.name}}</option>
                                     {% endfor %}
@@ -83,7 +80,7 @@
                             </div>
                             <div class="col-4 p-2 text-info font-weight-bold font-italic">
                                 <label for="qty-${number}"> Quantité</label>
-                                <input required name="quantity" type="number" min="1" step="0.1" class="form-control" id="qty-${number}">
+                                <input required name="quantity-${number}" type="number" min="1" step="0.1" class="form-control" id="qty-${number}">
                     
                             </div>
                         </div>

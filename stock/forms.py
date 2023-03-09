@@ -62,6 +62,7 @@ class ClientForm(forms.ModelForm):
         
         
 class ProductForm(forms.ModelForm):
+    code = forms.CharField(widget=forms.TextInput(attrs={'readonly':'readonly'}))
     class Meta:
         model = Product
         fields = '__all__'

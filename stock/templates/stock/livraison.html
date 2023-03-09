@@ -21,28 +21,34 @@
         <table id="example" class="display table table-striped table-hover">
             <thead>
                 <tr>
-                    <th>Numero livraison</th>
+                    <th>Numero de commande</th>
                     <th>Client</th>
                     <th> Date Commande</th>
                     <th> Transporteur</th>
                     <th> Status </th>
-                    <th style="width: 10%;">Action</th>
+                    <th style="width: 15%;">Action</th>
                 </tr>
             </thead>
             <tbody>
                 {% for livraison in page_obj %}
                 <tr>
-                    <td>{{livraison.num_livraison}}</td>
+                    <td>{{livraison.commande.num_commande}}</td>
                     <td>{{livraison.commande.client}}</td>
-                    <td>{{livraison.create_at}}</td>
+                    <td>{{livraison.commande.date_commande}}</td>
                     <td>{{livraison.commande.transport}}</td>
                     {% if livraison.livre is False %}
                     <td class="text-danger font-weight-bold"><i style="font-size: 15px;" class="fa-solid fa-circle"></i> &nbsp;&nbsp;En cours</td>
                     {% endif %}
                     <td>
-                        <a href="{% url 'edit_livraison' livraison.id %}" class="btn btn-info bg-info text-center text-white" title="Modifier">
+                        <a href="{% url 'edit_livraison' livraison.id %}" class="btn btn-warning bg-warning text-center text-white" title="Modifier">
                               <i style="font-size: 15px;" class="fa-solid fa-check"></i>
                         </a> 
+                        <a href="{% url 'print_commande' livraison.id %}" class="btn btn-info bg-info text-center text-white" title="Modifier">
+                            <i style="font-size: 15px;" class="fa-solid fa-eye"></i>
+                        </a> 
+                        <a href="{% url 'print_commande2' livraison.id %}" class="btn btn-secondary bg-secondary text-center text-white" title="Modifier">
+                            <i style="font-size: 15px;" class="fa-solid fa-print"></i>
+                        </a>
                     </td>
                 </tr>
                 {% endfor %}

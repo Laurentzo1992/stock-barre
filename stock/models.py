@@ -102,18 +102,24 @@ class Product(models.Model):
 
 
 
-    
-
 class Operation(models.Model):
-    products = models.ForeignKey(Product, verbose_name='produit', on_delete=models.CASCADE)
-    quantity = models.PositiveIntegerField()
+    products = models.ManyToManyField(Product, through='LigneOperation')
     fournisseur = models.ForeignKey(Client, verbose_name='Fournisseur', on_delete=models.CASCADE, null=True, blank=True)
     create_at = models.DateField(auto_now_add=True, null=True, blank=True)
 
-    
     def __str__(self):
         return self.product.name
     
+
+
+class LigneOperation(models.Model):
+    product = models.ForeignKey(Product, verbose_name='produit', on_delete=models.CASCADE)
+    operation = models.ForeignKey(Operation, null=True, blank=True, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField()
+    create_at = models.DateField(auto_now_add=True, null=True, blank=True)
+    
+    def __str__(self):
+        return self.product.code
     
 class Commande(models.Model):
     num_commande = models.CharField(unique=True, max_length=100, null=True, blank=True)

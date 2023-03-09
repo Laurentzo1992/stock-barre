@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% block title %} imprresion commande {% endblock %}
+
+
+{% block main %}
+
+ <!-- Nav tabs -->
+ <ul class="nav nav-tabs" id="myTab" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">Informations de la commande</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link position-relative" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="false">
+        Liste des items
+        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+            {{nbr_items}}
+            <span class="visually-hidden">Items</span>
+        </span>        
+      </button>
+    </li>
+  </ul>
+  
+  <!-- Tab panes -->
+<div class="tab-content">
+    <div class="tab-pane active" id="home" role="tabpanel" aria-labelledby="home-tab"> 
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col"> Numero de commande</th>
+                        <th scope="col">Adresse de livraison</th>
+                        <th scope="col">Client</th>
+                        <th scope="col">Date de la commande</th>
+                        <th scope="col">Transporteur</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="">
+                        <td scope="row">{{ma_commande.num_commande}}</td>
+                        <td>{{ma_commande.adresse_livraison}}</td>
+                        <td>{{ma_commande.client}}</td>
+                        <td>{{ma_commande.date_commande}}</td>
+                        <td>{{ma_commande.transport}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="tab-pane" id="profile" role="tabpanel" aria-labelledby="profile-tab"> 
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col"> Ordre </th>
+                        <th scope="col"> Article </th>
+                        <th scope="col">Quantité</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for article_commande  in article_commandes  %}
+                    <tr class="font-italic font-weight-bold">
+                        <td scope="row">{{forloop.counter}}</td>
+                        <td>{{article_commande.article}}</td>
+                        <td>{{article_commande.quantite}}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+ 
+{% endblock main %}

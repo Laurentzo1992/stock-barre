@@ -26,9 +26,7 @@
         <table id="example" class="display table table-striped table-hover">
             <thead>
                 <tr>
-                    <th>Article</th>
-                    <th>Code</th>
-                    <th>Code bare</th>
+                    <th>Ordre</th>
                     <th>Fournisseur</th>
                     <th> Date opeartion</th>
                     <th style="width: 10%;">Action</th>
@@ -37,14 +35,12 @@
             <tbody>
                 {% for operation in page_obj %}
                 <tr>
-                    <td>{{operation.products.code}}</td>
-                    <td>{{operation.products.name}}</td>
-                    <td><a href=""><img src="{{operation.products.barcode.url}}" class="w-25 h-15"></a></td>
+                    <td>{{operation.id}}</td>
                     <td>{{operation.fournisseur}}</td>
                     <td>{{operation.create_at}}</td>
                     <td>
-                        <a href="{% url 'edit_product' operation.id %}" class="btn btn-warning bg-warning text-center" title="Modifier">
-                              <i style="font-size: 15px;" class="fa-solid fa-pencil"></i>
+                        <a href="{% url 'operation_print' operation.id %}" class="btn btn-warning bg-warning text-center" title="Modifier">
+                              <i style="font-size: 15px;" class="fa-solid fa-eye"></i>
                         </a> 
                     </td>
                 </tr>

@@ -8,7 +8,7 @@
 
 
 
-<div class="card">
+<div class="card" id="main">
     <div class="card-header text-center font-italic font-weight-bold">
        <span class="text-info font-italic font-weight-bold">Commande numero :  {{livraison.num_livraison}}</span>
     </div>
@@ -55,6 +55,30 @@
           {% endif %}
         </div>
     </div>
+</div>
+
+
+    
+<button onclick="printData()" class="btn btn-primary mt-3 float-right"><i style="font-size: 25px;" class="fa-solid fa-print"></i></button>
+
+
+
+
+
+
+
+
+<script>
+    function printData() {
+        var divToPrint = document.getElementById("main"); 
+        newWin = window.open("");
+        newWin.document.write(divToPrint.outerHTML);
+        newWin.print();
+        newWin.close();
+    }
+
+</script>
+
 
 {% endblock main %}
 

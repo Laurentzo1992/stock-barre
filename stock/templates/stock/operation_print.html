@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block title %} impression {% endblock %}
+
+{% block main %}
+
+
+
+<div class="d-flex flex-column align-content-center" id="main">
+    <h4 class="font-italic font-weight-bold text-info">Fournisseur : {{op_id.fournisseur}}</h4>
+    <table id="example" class="display table table-striped table-hover">
+        <thead>
+            <tr>
+                <th>Code Article</th>
+                <th>Nom Article</th>
+                <th>Quantité</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for operations_ligne in operations_lignes %}
+            <tr>
+                <td>{{operations_ligne.product.code}}</td>
+                <td>{{operations_ligne.product.name}}</td>
+                <td>{{operations_ligne.quantity}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<button onclick="printData()" class="btn btn-primary mt-3 float-right"><i style="font-size: 25px;" class="fa-solid fa-print"></i></button>
+
+
+
+<script>
+    function printData() {
+        var divToPrint = document.getElementById("main"); 
+        newWin = window.open("");
+        newWin.document.write(divToPrint.outerHTML);
+        newWin.print();
+        newWin.close();
+    }
+
+</script>
+
+
+{% endblock main %}
