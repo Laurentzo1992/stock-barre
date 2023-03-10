@@ -9,14 +9,14 @@
 
 {% endblock search %}
 
-<div class="container d-flex flex-column mb-5">
+<div class="container d-flex flex-column mb-1">
     {% block dashboad %}
-    <div class="row">
+    <div class="row m-1">
         <div class="col-4">
             <div class="card text-bg-primary mb-5 mt-2 shadow-lg">
                 <div class="card-header text-white text-center text-uppercase font-weight-bold bg-secondary">Articles</div>
                 <div class="card-body">
-                <h1 class="card-title text-center text-secondary"><i class="fa-solid fa-cart-plus" style="color: #f5ef34;"></i>&nbsp;&nbsp;&nbsp;&nbsp; {{articles}} </h1>
+                <h1 class="card-title text-center text-secondary"><i class="fa-solid fa-cart-plus text-success" style="color: #f5ef34;"></i>&nbsp;&nbsp;&nbsp;&nbsp; {{articles}} </h1>
                 </div>
             </div>
         </div>
@@ -24,7 +24,7 @@
             <div class="card text-bg-primary mb-5 mt-2 shadow-lg">
                 <div class="card-header text-white text-center text-uppercase font-weight-bold bg-secondary">Commandes</div>
                 <div class="card-body">
-                <h1 class="card-title text-center text-secondary"><i class="fa-solid fa-server" style="color: #C70039;"></i>&nbsp;&nbsp;&nbsp;&nbsp; {{articles_commandes}} </h1>
+                <h1 class="card-title text-center text-secondary"><i class="fa-solid fa-server text-info" style="color: #C70039;"></i>&nbsp;&nbsp;&nbsp;&nbsp; {{articles_commandes}} </h1>
                 </div>
             </div>
         </div>
@@ -38,8 +38,110 @@
             </div>
         </div>
     </div>
+    <div class="row m-2">
+        <div class="mb-3">
+            <form method="get" action="{% url 'index' %}">
+                <label for="" class="form-label font-italic font-weight-bold text-danger">Du</label>
+                <input type="date" value="{{date_depart}}"name="date_depart" id="date_depart" class="text-info font-italic font-weight-bold">
+                <label for="" class="form-label font-italic font-weight-bold text-danger">Au</label>
+                <input type="date" value="{{date_arrive}}" name="date_arrive" id="date_arrive" class="text-info font-italic font-weight-bold">
+                <button type="submit" id="submit" class="btn btn-secondary">Filtrer</button>
+                <a href="{% url 'index' %}?reset" class="btn btn-danger">reset</a>
+             </form>
+        </div>
+    </div>
+    <div class="row m-5">
+        <div class="col-6">
+                <canvas id="myChart" width="400" height="400"></canvas>
+                <script>
+                    function generateRandomColors1(numColors1) {
+                        var colors1 = [];
+                        for (var i = 0; i < numColors1; i++) {
+                          var color1 = 'rgba(' + Math.floor(Math.random() * 256) + ','
+                                              + Math.floor(Math.random() * 256) + ','
+                                              + Math.floor(Math.random() * 256) + ','
+                                              + '1)';
+                          colors1.push(color1);
+                        }
+                        return colors1;
+                      }
+                
+                      var barres1 = {{ barres1 }}; // récupère la valeur de barres passée depuis la vue Django
+                      var barColors1 = generateRandomColors1(barres1);
+
+                    var ctx = document.getElementById('myChart').getContext('2d');
+                    var myChart = new Chart(ctx, {
+                        type: 'pie',
+                        data: {
+                            labels: [{% for etat in etats1 %}'{{etat.client__rasion_sociale}}', {% endfor %}],
+                            datasets: [{
+                                label: 'Meilleur client',
+                                data: [{% for etat in etats1 %}{{ etat.total }}, {% endfor %}],
+                                backgroundColor: barColors1,
+                                borderColor: barColors1,
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            scales: {
+                                yAxes: [{
+                                    ticks: {
+                                        beginAtZero: true
+                                    }
+                                }]
+                            }
+                        }
+                    });
+                </script>
+        </div>
+
+
+        <div class="col-6">
+                <canvas id="myChart1" width="400" height="400"></canvas>
+                <script>
+                    function generateRandomColors(numColors) {
+                        var colors = [];
+                        for (var i = 0; i < numColors; i++) {
+                          var color = 'rgba(' + Math.floor(Math.random() * 256) + ','
+                                              + Math.floor(Math.random() * 256) + ','
+                                              + Math.floor(Math.random() * 256) + ','
+                                              + '1)';
+                          colors.push(color);
+                        }
+                        return colors;
+                      }
+                
+                      var barres = {{ barres }}; // récupère la valeur de barres passée depuis la vue Django
+                      var barColors = generateRandomColors(barres);
+
+
+                    var ctx1 = document.getElementById('myChart1').getContext('2d');
+                    var myChart1 = new Chart(ctx1, {
+                        type: 'bar',
+                        data: {
+                            labels: [{% for etat in etats %}'{{ etat.article__code }}', {% endfor %}],
+                            datasets: [{
+                                label: 'Quantité',
+                                data: [{% for etat in etats %}{{ etat.quantite }}, {% endfor %}],
+                                backgroundColor: barColors,
+                                borderColor: barColors,
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            scales: {
+                                yAxes: [{
+                                    ticks: {
+                                        beginAtZero: true
+                                    }
+                                }]
+                            }
+                        }
+                    });
+                </script>
+        </div>
+    </div>
    {% endblock dashboad %}
-   
 </div>
 
 

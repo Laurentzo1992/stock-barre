@@ -5,6 +5,7 @@ from stock.views import SearchProductView
 
 urlpatterns = [
     path('index', views.index, name='index'),
+    path('acces_denied', views.acces_denied, name='acces_denied'),
     path('client', views.client, name='client'),
     path('add_client', views.add_client, name='add_client'),
     path('edit_client/<int:id>', views.edit_client, name='edit_client'),

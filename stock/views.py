@@ -1,7 +1,7 @@
 from . import forms
 from .forms import ProductForm, ClientForm, LivraisonForm, TransporteurForm , Niveau1Form, Niveau2Form, Niveau3Form, Niveau4Form, Niveau5Form
 from django.shortcuts import redirect, render, get_object_or_404
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from  django.views.decorators.cache import cache_control 
 from  django.contrib import messages
 from django.http import HttpResponseRedirect, HttpResponse, FileResponse, JsonResponse
@@ -25,15 +25,37 @@ from django.views.generic import View
 @login_required
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def index(request):
+    #recupérez les date selectionnées depuis le template
+    date_depart = request.GET.get('date_depart')
+    date_arrive = request.GET.get('date_arrive')
+    #Verifie si les dates ont été bien récupéré
+    if date_depart and date_arrive:
+        #on fait le filtre
+        etats1 = Commande.objects.filter(date_commande__range=[date_depart, date_arrive]).values('client__rasion_sociale').annotate(total=Count('client'))
+        etats = LigneCommande.objects.filter(commande__in=Commande.objects.all(), commande__date_commande__range=[date_depart, date_arrive]).values('article__code').annotate(total=Count('article'), quantite=Sum('quantite'))
+    else:
+        # si non retourne les éléments sans filtre
+        etats1 = Commande.objects.all().values('client__rasion_sociale').annotate(total=Count('client'))
+        etats = LigneCommande.objects.filter(commande__in=Commande.objects.all()).values('article__code').annotate(total=Count('article'), quantite=Sum('quantite'))
+    # on compte le nombre de ligne retournées pour dynamiser le graphique
+    barres = etats.count()
+    barres1 = etats1.count()
+    # on selectionne et on compte le nombre de produit disponible dans la base
     articles = Product.objects.all().count()
+    # on selectionne et on compte le nombre de commande passées disponible dans la base
     articles_commandes = Commande.objects.all().count()
+    # on selectionne et on compte le nombre de commande livré disponible dans la base
     articles_livres = Livraison.objects.filter(livre=True).count()
-    context={"articles":articles, "articles_commandes":articles_commandes, "articles_livres":articles_livres}
+    context={"date_depart":date_depart, "date_arrive":date_arrive, "barres1":barres1, "etats1":etats1, "barres":barres, "etats":etats, "articles":articles, "articles_commandes":articles_commandes, "articles_livres":articles_livres}
+    # on reinitialise le filtre
+    if 'reset' in request.GET:
+        return redirect('index')
     return render(request, 'stock/index.html', context)
 
 
 
 @login_required
+@permission_required('stock.view_client')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def client(request):
     clients = Client.objects.all().order_by('-id')
@@ -45,6 +67,7 @@ def client(request):
 
 
 @login_required
+@permission_required('stock.add_client', login_url='acces_denied')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def add_client(request):
     if request.method == 'POST':
@@ -64,6 +87,7 @@ def add_client(request):
 
 
 @login_required
+@permission_required('stock.change_client', login_url='acces_denied')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def edit_client(request, id):
     client = Client.objects.get(id=id)
@@ -80,6 +104,7 @@ def edit_client(request, id):
 
 
 @login_required
+@permission_required('stock.delete_client', login_url='acces_denied')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def delete_client(request, id):
     client = Client.objects.get(id=id)
@@ -90,6 +115,7 @@ def delete_client(request, id):
     return render(request, 'stock/delete_client.html', {"client":client})
 
 @login_required
+@permission_required('stock.view_transporteur')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def transport(request):
     transports = Transporteur.objects.all().order_by('-id')
@@ -102,6 +128,7 @@ def transport(request):
 
 
 @login_required
+@permission_required('stock.add_transporteur', login_url='acces_denied')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def add_transport(request):
     if request.method == 'POST':
@@ -122,6 +149,7 @@ def add_transport(request):
 
 
 @login_required
+@permission_required('stock.change_transporteur', login_url='acces_denied')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)  
 def edit_transport(request, id):
     transport = Transporteur.objects.get(id=id)
@@ -138,6 +166,7 @@ def edit_transport(request, id):
 
 
 @login_required
+@permission_required('stock.delete_transporteur', login_url='acces_denied')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def delete_transport(request, id):
     transport = Transporteur.objects.get(id=id)
@@ -151,11 +180,13 @@ def delete_transport(request, id):
 
 
 @login_required
+@permission_required('stock.view_niveau1', login_url='acces_denied')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def niveau(request):
     return render(request, 'stock/niveau.html')
 
 @login_required
+@permission_required('stock.add_niveau1', login_url='acces_denied')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def create_n1(request):
     niveau1 = Niveau1.objects.all()
@@ -176,6 +207,7 @@ def create_n1(request):
 
 
 @login_required
+@permission_required('stock.change_niveau1', login_url='acces_denied')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)  
 def edit_n1(request, id):
     niveau = Niveau1.objects.get(id=id)
@@ -192,6 +224,7 @@ def edit_n1(request, id):
 
 
 @login_required
+@permission_required('stock.add_niveau2', login_url='acces_denied')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def create_n2(request):
     niveau2 = Niveau2.objects.all()
@@ -212,6 +245,7 @@ def create_n2(request):
 
 
 @login_required
+@permission_required('stock.change_niveau2', login_url='acces_denied')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)  
 def edit_n2(request, id):
     niveau2 = Niveau2.objects.get(id=id)
@@ -229,6 +263,7 @@ def edit_n2(request, id):
 
 
 @login_required
+@permission_required('stock.add_niveau2', login_url='acces_denied')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def create_n3(request):
     niveau3 = Niveau3.objects.all()
@@ -248,6 +283,7 @@ def create_n3(request):
 
 
 @login_required
+@permission_required('stock.change_niveau3', login_url='acces_denied')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)  
 def edit_n3(request, id):
     niveau3 = Niveau3.objects.get(id=id)
@@ -266,6 +302,7 @@ def edit_n3(request, id):
 
 
 @login_required
+@permission_required('stock.add_niveau4', login_url='acces_denied')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def create_n4(request):
     niveau4 = Niveau4.objects.all()
@@ -285,6 +322,7 @@ def create_n4(request):
 
 
 @login_required
+@permission_required('stock.change_niveau4', login_url='acces_denied')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)  
 def edit_n4(request, id):
     niveau4 = Niveau4.objects.get(id=id)
@@ -303,6 +341,7 @@ def edit_n4(request, id):
 
 
 @login_required
+@permission_required('stock.add_niveau5', login_url='acces_denied')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def create_n5(request):
     niveau5 = Niveau5.objects.all()
@@ -322,6 +361,7 @@ def create_n5(request):
 
 
 @login_required
+@permission_required('stock.change_niveau5', login_url='acces_denied')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)  
 def edit_n5(request, id):
     niveau5 = Niveau5.objects.get(id=id)
@@ -340,6 +380,7 @@ def edit_n5(request, id):
 
 
 @login_required 
+@permission_required('stock.add_commande', login_url='acces_denied')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def commande(request):
     if request.method == 'POST':
@@ -403,6 +444,7 @@ def commande(request):
 
 
 @login_required
+@permission_required('stock.view_commande', login_url='acces_denied')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def print_commande(request, pk):
     commande_print = Livraison.objects.get(pk=pk)
@@ -416,6 +458,7 @@ def print_commande(request, pk):
 
 
 @login_required
+@permission_required('stock.view_commande', login_url='acces_denied')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def print_commande2(request, pk):
     commande_print = Livraison.objects.get(pk=pk)
@@ -428,6 +471,7 @@ def print_commande2(request, pk):
 
 
 @login_required
+@permission_required('stock.view_commande', login_url='acces_denied')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def livraison(request):
     livraisons = Livraison.objects.filter(livre=False).order_by('-id')
@@ -439,6 +483,7 @@ def livraison(request):
 
 
 @login_required
+@permission_required('stock.change_commande', login_url='acces_denied')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def edit_livraison(request, livraison_id):
     livraison = get_object_or_404(Livraison, id=livraison_id)
@@ -456,6 +501,7 @@ def edit_livraison(request, livraison_id):
 
 
 @login_required
+@permission_required('stock.change_commande', login_url='acces_denied')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def edit_livraison2(request, livraison_id):
     livraison = get_object_or_404(Livraison, id=livraison_id)
@@ -466,6 +512,7 @@ def edit_livraison2(request, livraison_id):
 
 
 @login_required
+@permission_required('stock.view_product', login_url='acces_denied')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def produit(request):
     articles = Product.objects.all().order_by('-id')
@@ -475,8 +522,9 @@ def produit(request):
     context={"page_obj":page_obj}
     return render(request, 'stock/produit.html', context)
 
-
-
+@login_required
+@permission_required('stock.view_product', login_url='acces_denied')
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def stock_barre(request):
     barcode = request.GET.get('barcode')
     if barcode:
@@ -495,6 +543,7 @@ def stock_barre(request):
 
 
 @login_required
+@permission_required('stock.add_product', login_url='acces_denied')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def add_product(request):
     year = datetime.datetime.now().year
@@ -517,6 +566,7 @@ def add_product(request):
         return render(request, 'stock/add_product.html', {"form":form})
     
 @login_required
+@permission_required('stock.change_product', login_url='acces_denied')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def edit_product(request, id):
     product = get_object_or_404(Product, id=id)
@@ -534,6 +584,7 @@ def edit_product(request, id):
 
 
 @login_required
+@permission_required('stock.delete_product', login_url='acces_denied')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True) 
 def delete_product(request, id):
     product = Product.objects.get(id=id)
@@ -558,6 +609,7 @@ class SearchProductView(View):
 
     
 @login_required
+@permission_required('stock.view_operation', login_url='acces_denied')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def stock_in(request):
     operations = Operation.objects.all().order_by('-id')
@@ -568,7 +620,8 @@ def stock_in(request):
     return render(request, 'stock/stock_in.html', context)
 
 
-@login_required 
+@login_required
+@permission_required('stock.add_operation', login_url='acces_denied')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def add_stock(request):
     if request.method == 'POST':
@@ -643,6 +696,7 @@ def add_stock(request):
 
  
 @login_required
+@permission_required('stock.view_operation', login_url='acces_denied')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def operation_print(request, id):
     op_id = Operation.objects.get(id=id)
@@ -654,6 +708,7 @@ def operation_print(request, id):
 
 
 @login_required
+@permission_required('stock.view_livraison', login_url='acces_denied')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def suivi(request):
     livraisons = Livraison.objects.all().filter(livre=True).order_by('-id')
@@ -751,6 +806,13 @@ class ExportProductsExcelView(View):
 #     print_label(product)
 #     #Redirige l'utilisateur vers la page de détails du produit
 #     return redirect('product_detail', product_id=product_id)
+
+
+
+@login_required
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def acces_denied(request):
+    return render(request, 'stock/acces_denied.html')
 
 
     

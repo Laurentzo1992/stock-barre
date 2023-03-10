@@ -57,7 +57,7 @@ class Niveau5(models.Model):
 
 class Client(models.Model):
     rasion_sociale = models.CharField(max_length=100, null=True, blank=True)
-    nom_prenom = models.CharField(max_length=10, null=True, blank=True)
+    nom_prenom = models.CharField(max_length=100, null=True, blank=True)
     adresse = models.TextField(null=True, blank=True)
     phone_number = PhoneNumberField(unique=True, null=True, blank=True, verbose_name="Numero de téléphone")
     email = models.EmailField(null=True, blank=True)

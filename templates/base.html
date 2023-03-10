@@ -76,6 +76,7 @@
 		<div class="dropdown dropstart">
 			<button class="btn btn-white dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
 				<i class="fa-solid fa-user"></i>
+				{{request.user}}
 			</button>
 			<ul class="dropdown-menu bg-info">
 				<li><a class="dropdown-item bg-info text-white" href="{% url 'change_password' %}">changer son mot de passe</a></li>
@@ -94,51 +95,69 @@
 									<i class="fas fa-house text-white"></i> <span class="ms-1 d-none d-sm-inline text-white">Home</span>
 								</a>
 							</li>
+							{% if perms.stock.view_niveau1 %}
 							<li class="nav-item">
 								<a href="{% url 'niveau' %}" class="nav-link align-middle px-0">
-									<i class="fas fa-gear text-white"></i> <span class="ms-1 d-none d-sm-inline text-white">Niveau</span>
+									<i class="fas fa-cart-plus text-white"></i> <span class="ms-1 d-none d-sm-inline text-white">Niveau de stockage</span>
 								</a>
 							</li>
+							{% endif %}
+							{% if perms.stock.view_client %}
 							<li class="nav-item">
 								<a href="{% url 'client' %}" class="nav-link align-middle px-0">
-									<i class="fas fa-users text-white"></i> <span class="ms-1 d-none d-sm-inline text-white">Client</span>
+									<i class="fas fa-user text-white"></i> <span class="ms-1 d-none d-sm-inline text-white">Client</span>
 								</a>
 							</li>
+							{% endif %}
+							{% if perms.stock.view_transporteur %}
 							<li class="nav-item">
 								<a href="{% url 'transport' %}" class="nav-link align-middle px-0">
 									<i class="fas fa-car text-white"></i> <span class="ms-1 d-none d-sm-inline text-white">Transporteur</span>
 								</a>
 							</li>
+							{% endif %}
+							{% if perms.stock.view_product %}
 							<li class="nav-item">
 								<a href="{% url 'produit' %}" class="nav-link align-middle px-0">
 									<i class="fa-solid fa-newspaper text-white"></i> <span class="ms-1 d-none d-sm-inline text-white">Article</span>
 								</a>
 							</li>
+							{% endif %}
+							{% if perms.stock.view_operation %}
 							<li class="nav-item">
 								<a href="{% url 'stock_in' %}" class="nav-link align-middle px-0">
 									<i class="fa-solid fa-arrow-trend-up text-white"></i> <span class="ms-1 d-none d-sm-inline text-white">Provisions</span>
 								</a>
 							</li>
+							{% endif %}
+							{% if perms.stock.view_product %}
 							<li class="nav-item">
 								<a href="{% url 'stock_barre' %}" class="nav-link align-middle px-0">
 									<i class="fa-solid fa-eye text-white"></i> <span class="ms-1 d-none d-sm-inline text-white">Lecture</span>
 								</a>
 							</li>
+							{% endif %}
+							{% if perms.stock.view_commande %}
 							<li class="nav-item">
 								<a href="{% url 'commande' %}" class="nav-link align-middle px-0">
 									<i class="fa-solid fa-server text-white"></i> <span class="ms-1 d-none d-sm-inline text-white">Commande</span>
 								</a>
 							</li>
+							{% endif %}
+							{% if perms.stock.view_livraison %}
 							<li class="nav-item">
 								<a href="{% url 'livraison' %}" class="nav-link align-middle px-0">
 									<i class="fa-solid fa-car text-white"></i> <span class="ms-1 d-none d-sm-inline text-white">Livraison</span>
 								</a>
 							</li>
+							{% endif %}
+							{% if perms.stock.view_livraison %}
 							<li class="nav-item">
 								<a href="{% url 'suivi' %}" class="nav-link align-middle px-0">
 									<i class="fa-solid fa-map text-success"></i> <span class="ms-1 d-none d-sm-inline text-white">Suivi</span>
 								</a>
 							</li>
+							{% endif %}
 							
 							{% comment %} <li>
 								<a href="#submenu2" data-bs-toggle="collapse" class="nav-link px-0 align-middle">

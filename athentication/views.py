@@ -1,16 +1,12 @@
 from . import forms
 from .forms import LoginForm
 from django.contrib.auth.forms import PasswordChangeForm
-from django.shortcuts import redirect, render, get_object_or_404
+from django.shortcuts import redirect, render
 from django.contrib.auth import login, authenticate, logout, get_user_model, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from  django.views.decorators.cache import cache_control 
 User = get_user_model()
 from  django.contrib import messages
-from django.core.paginator import Paginator
-from django.contrib.auth.models import Permission
-from django.contrib.contenttypes.models import ContentType
-from django.shortcuts import get_object_or_404
 
 
 
@@ -66,35 +62,3 @@ def change_password(request):
         'form': form
     })
     
-    
-    
-#Function to create users
-def add_user(request):
-    form = forms.CreateUser()
-    if request.method == 'POST':
-        form = forms.CreateUser(request.POST,request.FILES,)
-        if form.is_valid():
-            form.save()
-            return redirect('list')
-    return render(request, 'authentication/add.html', context={'form':form})
-
-# Edit user edit function
-def edit_user(request, id):
-    user = User.objects.get(id=id)
-    if request.method == 'POST':
-        form = forms.CreateUser(request.POST,request.FILES, instance=user)
-        if form.is_valid():
-            form.save(id)
-            return redirect('list')
-    else:
-        form = forms.CreateUser(instance=user)
-    return render(request, 'authentication/edit.html', {'form':form})
-
-
-
-def delete_user(request,id):
-    user = User.objects.get(id=id)
-    if request.method == 'POST':
-        user.delete()
-        return redirect('list')
-    return render(request, 'authentication/delete.html', {'user':user})
