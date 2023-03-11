@@ -35,7 +35,7 @@
             <tbody>
                 {% for operation in page_obj %}
                 <tr>
-                    <td>{{operation.id}}</td>
+                    <td>{{forloop.counter}}</td>
                     <td>{{operation.fournisseur}}</td>
                     <td>{{operation.create_at}}</td>
                     <td>

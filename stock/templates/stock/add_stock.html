@@ -10,7 +10,8 @@
 
             <div class="col-12 p-2 mt-2 text-info font-weight-bold font-italic d-flex flex-column">
                 <label for="fournisseur"> Fournisseurs </label>
-                <select name="fournisseur" class="form-control" id="fournisseur">
+                <select name="fournisseur" class="form-control" id="fournisseur" required>
+                    <option></option>
                     {% for fournis in suppliers %}
                     <option value="{{fournis.id}}">{{forloop.counter}}-{{fournis.rasion_sociale}}</option>
                     {% endfor %}
@@ -30,6 +31,7 @@
                     <div class="col-4  p-2">
                         <label for="article-1">Article</label>
                         <select name="products" class="form-control" id="article-1">
+                            <option></option>
                             {% for product in products %}
                             <option value="{{product.id}}">{{forloop.counter}}-{{product.name}}</option>
                             {% endfor %}

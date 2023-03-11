@@ -37,6 +37,7 @@
   <!-- Latest compiled and minified CSS --> 
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
   <!-- Latest compiled JavaScript --> 
+  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" integrity="sha256-Uv9BNBucvCPipKQ2NS9wYpJmi8DTOEfTA/nH2aoJALw=" crossorigin="anonymous"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.css" integrity="sha256-aa0xaJgmK/X74WM224KMQeNQC2xYKwlAt08oZqjeF0E=" crossorigin="anonymous" />
@@ -75,12 +76,12 @@
 	<div class="row bg-info mb-0 h-10">
 		<div class="dropdown dropstart">
 			<button class="btn btn-white dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-				<i class="fa-solid fa-user"></i>
-				{{request.user}}
+				<i class="fa-solid fa-user text-white"></i>
+				<span class="text-white font-italic font-weight-bold">{{request.user}}</span>
 			</button>
 			<ul class="dropdown-menu bg-info">
-				<li><a class="dropdown-item bg-info text-white" href="{% url 'change_password' %}">changer son mot de passe</a></li>
-				<li><a class="dropdown-item bg-info text-white" href="{% url 'logout_user' %}">logout</a></li>
+				<li><a class="dropdown-item bg-info text-white font-italic font-weight-bold" href="{% url 'change_password' %}">changer son mot de passe</a></li>
+				<li><a class="dropdown-item bg-info text-white font-italic font-weight-bold" href="{% url 'logout_user' %}">logout</a></li>
 			</ul>
 		</div>
 	</div>
@@ -92,69 +93,69 @@
 						<ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start" id="menu">
 							<li class="nav-item">
 								<a href="{% url 'index' %}" class="nav-link align-middle px-0">
-									<i class="fas fa-house text-white"></i> <span class="ms-1 d-none d-sm-inline text-white">Home</span>
+									<i class="fas fa-house text-white"></i> <span class="ms-1 d-none d-sm-inline text-white font-italic font-weight-bold">Home</span>
 								</a>
 							</li>
 							{% if perms.stock.view_niveau1 %}
 							<li class="nav-item">
 								<a href="{% url 'niveau' %}" class="nav-link align-middle px-0">
-									<i class="fas fa-cart-plus text-white"></i> <span class="ms-1 d-none d-sm-inline text-white">Niveau de stockage</span>
+									<i class="fas fa-cart-plus text-white"></i> <span class="ms-1 d-none d-sm-inline text-white font-italic font-weight-bold">Niveau de stockage</span>
 								</a>
 							</li>
 							{% endif %}
 							{% if perms.stock.view_client %}
 							<li class="nav-item">
 								<a href="{% url 'client' %}" class="nav-link align-middle px-0">
-									<i class="fas fa-user text-white"></i> <span class="ms-1 d-none d-sm-inline text-white">Client</span>
+									<i class="fas fa-user text-white"></i> <span class="ms-1 d-none d-sm-inline text-white font-italic font-weight-bold">Client</span>
 								</a>
 							</li>
 							{% endif %}
 							{% if perms.stock.view_transporteur %}
 							<li class="nav-item">
 								<a href="{% url 'transport' %}" class="nav-link align-middle px-0">
-									<i class="fas fa-car text-white"></i> <span class="ms-1 d-none d-sm-inline text-white">Transporteur</span>
+									<i class="fas fa-car text-white"></i> <span class="ms-1 d-none d-sm-inline text-white font-italic font-weight-bold">Transporteur</span>
 								</a>
 							</li>
 							{% endif %}
 							{% if perms.stock.view_product %}
 							<li class="nav-item">
 								<a href="{% url 'produit' %}" class="nav-link align-middle px-0">
-									<i class="fa-solid fa-newspaper text-white"></i> <span class="ms-1 d-none d-sm-inline text-white">Article</span>
+									<i class="fa-solid fa-newspaper text-white"></i> <span class="ms-1 d-none d-sm-inline text-white font-italic font-weight-bold">Article</span>
 								</a>
 							</li>
 							{% endif %}
 							{% if perms.stock.view_operation %}
 							<li class="nav-item">
 								<a href="{% url 'stock_in' %}" class="nav-link align-middle px-0">
-									<i class="fa-solid fa-arrow-trend-up text-white"></i> <span class="ms-1 d-none d-sm-inline text-white">Provisions</span>
+									<i class="fa-solid fa-arrow-trend-up text-white"></i> <span class="ms-1 d-none d-sm-inline text-white font-italic font-weight-bold">Provisions</span>
 								</a>
 							</li>
 							{% endif %}
 							{% if perms.stock.view_product %}
 							<li class="nav-item">
 								<a href="{% url 'stock_barre' %}" class="nav-link align-middle px-0">
-									<i class="fa-solid fa-eye text-white"></i> <span class="ms-1 d-none d-sm-inline text-white">Lecture</span>
+									<i class="fa-solid fa-eye text-white"></i> <span class="ms-1 d-none d-sm-inline text-white font-italic font-weight-bold">Lecture</span>
 								</a>
 							</li>
 							{% endif %}
 							{% if perms.stock.view_commande %}
 							<li class="nav-item">
 								<a href="{% url 'commande' %}" class="nav-link align-middle px-0">
-									<i class="fa-solid fa-server text-white"></i> <span class="ms-1 d-none d-sm-inline text-white">Commande</span>
+									<i class="fa-solid fa-server text-white"></i> <span class="ms-1 d-none d-sm-inline text-white font-italic font-weight-bold">Commande</span>
 								</a>
 							</li>
 							{% endif %}
 							{% if perms.stock.view_livraison %}
 							<li class="nav-item">
 								<a href="{% url 'livraison' %}" class="nav-link align-middle px-0">
-									<i class="fa-solid fa-car text-white"></i> <span class="ms-1 d-none d-sm-inline text-white">Livraison</span>
+									<i class="fa-solid fa-car text-white"></i> <span class="ms-1 d-none d-sm-inline text-white font-italic font-weight-bold">Livraison</span>
 								</a>
 							</li>
 							{% endif %}
 							{% if perms.stock.view_livraison %}
 							<li class="nav-item">
 								<a href="{% url 'suivi' %}" class="nav-link align-middle px-0">
-									<i class="fa-solid fa-map text-success"></i> <span class="ms-1 d-none d-sm-inline text-white">Suivi</span>
+									<i class="fa-solid fa-map text-success"></i> <span class="ms-1 d-none d-sm-inline text-white font-italic font-weight-bold">Suivi</span>
 								</a>
 							</li>
 							{% endif %}

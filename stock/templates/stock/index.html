@@ -9,11 +9,11 @@
 
 {% endblock search %}
 
-<div class="container d-flex flex-column mb-1">
+<div class="container d-flex flex-column mb-2">
     {% block dashboad %}
-    <div class="row m-1">
+    <div class="row mb-2">
         <div class="col-4">
-            <div class="card text-bg-primary mb-5 mt-2 shadow-lg">
+            <div class="card text-bg-primary mb-2 mt-2 shadow-lg">
                 <div class="card-header text-white text-center text-uppercase font-weight-bold bg-secondary">Articles</div>
                 <div class="card-body">
                 <h1 class="card-title text-center text-secondary"><i class="fa-solid fa-cart-plus text-success" style="color: #f5ef34;"></i>&nbsp;&nbsp;&nbsp;&nbsp; {{articles}} </h1>
@@ -21,7 +21,7 @@
             </div>
         </div>
         <div class="col-4">
-            <div class="card text-bg-primary mb-5 mt-2 shadow-lg">
+            <div class="card text-bg-primary mb-2 mt-2 shadow-lg">
                 <div class="card-header text-white text-center text-uppercase font-weight-bold bg-secondary">Commandes</div>
                 <div class="card-body">
                 <h1 class="card-title text-center text-secondary"><i class="fa-solid fa-server text-info" style="color: #C70039;"></i>&nbsp;&nbsp;&nbsp;&nbsp; {{articles_commandes}} </h1>
@@ -29,7 +29,7 @@
             </div>
         </div>
         <div class="col-4">
-            <div class="card text-bg-primary mb-5 mt-2 shadow-lg">
+            <div class="card text-bg-primary mb-2 mt-2 shadow-lg">
                 <div class="card-header text-white text-center text-uppercase font-weight-bold bg-secondary">Livraison</div>
                 <div class="card-body">
                     
@@ -38,22 +38,38 @@
             </div>
         </div>
     </div>
-    <div class="row m-2">
+    <div class="row mb-2">
         <div class="mb-3">
             <form method="get" action="{% url 'index' %}">
-                <label for="" class="form-label font-italic font-weight-bold text-danger">Du</label>
+                <label for="" class="form-label font-italic font-weight-bold text-info">Du</label>
                 <input type="date" value="{{date_depart}}"name="date_depart" id="date_depart" class="text-info font-italic font-weight-bold">
-                <label for="" class="form-label font-italic font-weight-bold text-danger">Au</label>
+                <label for="" class="form-label font-italic font-weight-bold text-info">Au</label>
                 <input type="date" value="{{date_arrive}}" name="date_arrive" id="date_arrive" class="text-info font-italic font-weight-bold">
-                <button type="submit" id="submit" class="btn btn-secondary">Filtrer</button>
-                <a href="{% url 'index' %}?reset" class="btn btn-danger">reset</a>
+                <button type="submit" id="submit" class="btn btn-info"><i class="fa fa-search"></i></button>
+                <a href="{% url 'index' %}?reset" class="btn btn-danger"><i class="fa fa-refresh"></i></a>
              </form>
         </div>
     </div>
-    <div class="row m-5">
+    <div class="row">
         <div class="col-6">
+            <button id="export-btn"><i class="fa fa-file-image text-success"></i></button>
                 <canvas id="myChart" width="400" height="400"></canvas>
                 <script>
+
+                    const exportBtn = document.getElementById('export-btn');
+                    const canvas = document.getElementById('myChart');
+                    
+                    exportBtn.addEventListener('click', () => {
+                      html2canvas(canvas).then((canvas) => {
+                        const imgData = canvas.toDataURL('image/png');
+                        const link = document.createElement('a');
+                        link.download = 'ClientRegulier.png';
+                        link.href = imgData;
+                        link.click();
+                      });
+                    });
+                    
+                      
                     function generateRandomColors1(numColors1) {
                         var colors1 = [];
                         for (var i = 0; i < numColors1; i++) {
@@ -93,12 +109,30 @@
                         }
                     });
                 </script>
+            <h6 class="text-info font-italic font-weight-bold">Le client le plus fréquant</h6>
         </div>
 
 
         <div class="col-6">
+            <button id="export-chart1"><i class="fa fa-file-image text-success"></i></button>
                 <canvas id="myChart1" width="400" height="400"></canvas>
                 <script>
+                   
+                    const exportBtn1 = document.getElementById('export-chart1');
+                    const canvas1 = document.getElementById('myChart1');
+                    
+                    exportBtn1.addEventListener('click', () => {
+                      html2canvas(canvas1).then((canvas1) => {
+                        const imgData1 = canvas1.toDataURL('image/png');
+                        const link1 = document.createElement('a');
+                        link1.download = 'ArticlePlusSortant.png';
+                        link1.href = imgData1;
+                        link1.click();
+                      });
+                    });
+                    
+
+                      
                     function generateRandomColors(numColors) {
                         var colors = [];
                         for (var i = 0; i < numColors; i++) {
@@ -121,7 +155,7 @@
                         data: {
                             labels: [{% for etat in etats %}'{{ etat.article__code }}', {% endfor %}],
                             datasets: [{
-                                label: 'Quantité',
+                                label: 'Quantité d\'article par commande',
                                 data: [{% for etat in etats %}{{ etat.quantite }}, {% endfor %}],
                                 backgroundColor: barColors,
                                 borderColor: barColors,
@@ -139,6 +173,7 @@
                         }
                     });
                 </script>
+            <h6 class="text-info font-italic font-weight-bold">Produit le plus commandé</h6>
         </div>
     </div>
    {% endblock dashboad %}
